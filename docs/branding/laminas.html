@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--b:#0C0D10;--s:#15171C;--v:#8B3DFF;--vp:#5B1FD6;--vs:#F1E8FF;--g:linear-gradient(135deg,#6C2BFF,#B44CFF);--t:#F2F3F5;--ts:#9AA0AB;--c:#F4F5F7;--ok:#10B981;--al:#F59E0B;--ur:#F97316}
+*{box-sizing:border-box;margin:0}
+body{font-family:Manrope,sans-serif;background:#ddd}
+.l{width:1400px;height:900px;position:relative;overflow:hidden;padding:90px 110px;display:flex;flex-direction:column;justify-content:center;gap:28px}
+.claro{background:var(--c);color:var(--b)} .grafito{background:var(--b);color:var(--t)} .degradado{background:var(--g);color:#fff}
+.et{font-size:18px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;opacity:.7}
+h1,h2,.wm b{font-family:'Space Grotesk',sans-serif}
+h1{font-size:120px;font-weight:700;letter-spacing:-.04em;line-height:.95}
+h2{font-size:64px;font-weight:700;letter-spacing:-.03em;line-height:1.05}
+p{font-size:26px;line-height:1.45;max-width:900px}
+.n{position:absolute;right:110px;bottom:60px;font-size:18px;font-weight:700;opacity:.5}
+.fila{display:flex;gap:28px;align-items:center}
+.halo{position:absolute;border-radius:50%;filter:blur(10px)}
+.logo{display:flex;align-items:center;gap:28px}
+.iso{width:var(--s,160px);height:var(--s,160px);border-radius:22%;background:var(--bg,#121317);display:grid;place-items:center;flex:none}
+.iso svg{width:72%;height:72%}
+.wm b{display:block;font-size:var(--w,96px);font-weight:700;letter-spacing:.06em;line-height:1;color:var(--c2,var(--b))}
+.wm span{display:block;font-size:calc(var(--w,96px)*.22);font-weight:600;letter-spacing:.3em;color:var(--c2,var(--b));opacity:.6;margin-top:calc(var(--w,96px)*.14)}
+.caja{border-radius:28px;padding:40px;flex:1}
+.sw{flex:1;height:420px;border-radius:28px;padding:28px;display:flex;flex-direction:column;justify-content:flex-end;font-size:22px;font-weight:800}
+.sw small{display:block;font-weight:400;font-size:18px;opacity:.8}
+.mal{flex:1;background:#fff;border-radius:24px;padding:30px;display:grid;place-items:center;gap:14px;font-size:18px;font-weight:800;color:var(--b);text-align:center;height:300px;border:3px dashed var(--al)}
+img.cap{border-radius:22px;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.chip{display:inline-flex;align-items:center;gap:10px;background:var(--s);border:1px solid #262932;border-radius:999px;padding:14px 22px;font-size:20px;font-weight:700;color:var(--t)}
+.chip i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.chip svg{width:24px;height:24px;color:#B44CFF}
+</style></head><body>
+<template id="t"><svg viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6c2bff"/><stop offset="1" stop-color="#b44cff"/></linearGradient></defs><path d="M136 150h240v58h-91v184h-58V208h-91z" fill="url(#g)" transform="translate(-71 -71) scale(1.28)"/></svg></template>
+<template id="tb"><svg viewBox="0 0 512 512"><path d="M136 150h240v58h-91v184h-58V208h-91z" fill="#fff" transform="translate(-71 -71) scale(1.28)"/></svg></template>
+
+<!-- 01 Carátula -->
+<section class="l grafito" id="s01">
+  <div class="halo" style="width:700px;height:700px;right:-200px;top:-220px;background:radial-gradient(circle,rgba(139,61,255,.45),transparent 65%)"></div>
+  <div class="halo" style="width:480px;height:480px;right:260px;bottom:-280px;background:radial-gradient(circle,rgba(180,76,255,.35),transparent 65%)"></div>
+  <div class="logo"><div class="iso" style="--s:190px;--bg:#1A1C22"></div><div class="wm" style="--c2:#fff;--w:130px"><b>TRADEX</b><span>GESTIÓN</span></div></div>
+  <p style="font-size:34px;font-weight:800;background:var(--g);-webkit-background-clip:text;color:transparent">Identidad de marca · 2026</p>
+</section>
+
+<!-- 02 Brief -->
+<section class="l claro" id="s02">
+  <span class="et">Brief y desafío</span>
+  <h2>Un negocio que vivía en el chat</h2>
+  <div class="fila" style="align-items:stretch">
+    <div class="caja" style="background:var(--vs)"><p><b>El problema.</b> Pedidos en WhatsApp, cuadernos y planillas sueltas: fechas que se pierden, saldos que nadie cobra y precios calculados a mano.</p></div>
+    <div class="caja" style="background:#fff"><p><b>El desafío.</b> Una marca de herramienta de trabajo: seria para hablar de dinero, pero con energía para usarla todo el día.</p></div>
+  </div>
+</section>
+
+<!-- 03 Concepto -->
+<section class="l degradado" id="s03">
+  <span class="et">Concepto</span>
+  <h1>Todo pasa<br>por el mostrador.</h1>
+  <p style="max-width:760px">La T es el mostrador donde entra y sale cada pedido: una forma maciza, sin detalles finos, que se lee igual en 16 px que en una lámina. El degradado violeta le da movimiento sobre el grafito.</p>
+  <div class="iso" style="--s:280px;position:absolute;right:110px;bottom:110px"></div>
+</section>
+
+<!-- 04 Logotipo -->
+<section class="l claro" id="s04" style="padding:0;flex-direction:row;gap:0">
+  <div style="flex:1;display:grid;place-items:center;background:#fff"><div class="logo"><div class="iso" style="--s:140px"></div><div class="wm" style="--w:84px"><b>TRADEX</b><span>GESTIÓN</span></div></div></div>
+  <div style="flex:1;display:grid;place-items:center;background:var(--b)"><div class="logo"><div class="iso" style="--s:140px;--bg:#1A1C22"></div><div class="wm" style="--w:84px;--c2:#fff"><b>TRADEX</b><span>GESTIÓN</span></div></div></div>
+  <span class="et" style="position:absolute;left:110px;top:80px">Logotipo positivo y negativo</span>
+</section>
+
+<!-- 05 Construcción -->
+<section class="l claro" id="s05">
+  <span class="et">Construcción</span>
+  <div class="fila" style="gap:90px">
+    <div style="position:relative;width:420px;height:420px;background-image:linear-gradient(#dcd2f2 1px,transparent 1px),linear-gradient(90deg,#dcd2f2 1px,transparent 1px);background-size:35px 35px;border:1px solid #dcd2f2">
+      <div class="iso" style="--s:420px;opacity:.95"></div>
+      <div style="position:absolute;left:18%;right:18%;top:18%;bottom:18%;border:2px dashed #B44CFF"></div>
+    </div>
+    <div><h2>Cuadrado + T</h2><p>Un cuadrado de esquinas redondeadas (22 % del lado) en grafito y una T de barras gruesas con el degradado violeta. El trazo de la T mide un octavo del ícono: a 16 px nunca baja de 2 px.</p></div>
+  </div>
+</section>
+
+<!-- 06 Área de seguridad -->
+<section class="l claro" id="s06">
+  <span class="et">Área de seguridad y tamaño mínimo</span>
+  <div class="fila" style="gap:80px">
+    <div style="padding:60px;border:2px dashed var(--v);border-radius:20px;background:#fff"><div class="logo"><div class="iso" style="--s:110px"></div><div class="wm" style="--w:64px"><b>TRADEX</b><span>GESTIÓN</span></div></div></div>
+    <div><p>Alrededor del logo queda libre la mitad del lado del isotipo. Tamaño mínimo: 16 px como favicon y 24 px con el nombre al lado.</p>
+      <div class="fila" style="margin-top:30px"><div class="iso" style="--s:48px"></div><div class="iso" style="--s:32px"></div><div class="iso" style="--s:24px"></div><div class="iso" style="--s:16px"></div></div></div>
+  </div>
+</section>
+
+<!-- 07 Versiones -->
+<section class="l claro" id="s07">
+  <span class="et">Versiones</span>
+  <div class="fila" style="align-items:stretch">
+    <div class="caja" style="background:#fff;display:grid;place-items:center;height:330px"><div class="logo"><div class="iso" style="--s:90px"></div><div class="wm" style="--w:50px"><b>TRADEX</b><span>GESTIÓN</span></div></div></div>
+    <div class="caja" style="background:var(--g);display:grid;place-items:center;height:330px"><div class="iso" style="--s:170px"></div></div>
+    <div class="caja" style="background:var(--b);display:grid;place-items:center;height:330px"><div class="logo"><div class="iso mono" style="--s:90px;--bg:#22252C"></div><div class="wm" style="--w:50px;--c2:#fff"><b>TRADEX</b><span>GESTIÓN</span></div></div></div>
+  </div>
+  <div class="fila" style="font-size:20px;font-weight:800"><span style="flex:1">Horizontal</span><span style="flex:1">Isotipo (app y favicon)</span><span style="flex:1">Monocromo</span></div>
+</section>
+
+<!-- 08 Usos incorrectos -->
+<section class="l claro" id="s08">
+  <span class="et">Usos incorrectos</span>
+  <div class="fila">
+    <div class="mal"><div class="iso" style="--s:110px;transform:scaleX(1.5)"></div>No deformar</div>
+    <div class="mal"><div class="iso" style="--s:110px;--bg:#0EA5E9"></div>No cambiar el grafito</div>
+    <div class="mal"><div class="iso" style="--s:110px;transform:rotate(-25deg)"></div>No rotar</div>
+    <div class="mal" style="background:var(--v)"><div class="iso mono" style="--s:110px;--bg:#9B57FF"></div>No usar sobre fondos sin contraste</div>
+  </div>
+</section>
+
+<!-- 09 Paleta -->
+<section class="l claro" id="s09">
+  <span class="et">Paleta</span>
+  <div class="fila">
+    <div class="sw" style="background:var(--b);color:#fff">Grafito<small>#0C0D10 · base</small></div>
+    <div class="sw" style="background:var(--s);color:#fff">Superficie<small>#15171C · tarjetas</small></div>
+    <div class="sw" style="background:var(--g);color:#fff">Degradado<small>#6C2BFF → #B44CFF · acción</small></div>
+    <div class="sw" style="background:var(--v);color:#fff">Violeta<small>#8B3DFF · acento</small></div>
+    <div class="sw" style="background:#fff;border:1px solid #e5e7eb">Claro<small>#F4F5F7 · fondo</small></div>
+  </div>
+  <div class="fila" style="font-size:20px;font-weight:700;gap:18px"><span class="chip" style="background:#fff;color:var(--b)"><i style="background:var(--ok)"></i>Cobrado #10B981</span><span class="chip" style="background:#fff;color:var(--b)"><i style="background:var(--al)"></i>Saldo #F59E0B</span><span class="chip" style="background:#fff;color:var(--b)"><i style="background:var(--ur)"></i>Urgente #F97316</span></div>
+</section>
+
+<!-- 10 Tipografía -->
+<section class="l claro" id="s10">
+  <span class="et">Tipografía</span>
+  <div class="fila" style="gap:120px;align-items:flex-start">
+    <div><h1 style="font-size:150px">Aa</h1><h2>Space Grotesk</h2><p style="font-size:22px;margin-top:12px">Titulares, montos y el nombre de marca. Técnica, con cifras de ancho parejo.</p></div>
+    <div style="font-family:Manrope"><div style="font-size:150px;font-weight:800;line-height:.95;letter-spacing:-.04em">Aa</div><h2 style="font-family:Manrope;font-weight:800">Manrope</h2><p style="font-size:22px;margin-top:12px">Textos, tablas y botones. 400, 600 y 800: legible en tablas densas.</p></div>
+  </div>
+</section>
+
+<!-- 11 Recursos gráficos -->
+<section class="l grafito" id="s11">
+  <span class="et">Recursos gráficos</span>
+  <h2>Etiquetas de etapa e íconos de línea</h2>
+  <div class="fila" style="flex-wrap:wrap">
+    <span class="chip"><i style="background:#B44CFF"></i>Señado</span>
+    <span class="chip"><i style="background:#8B3DFF"></i>Pagado</span>
+    <span class="chip"><i style="background:var(--ur)"></i>Pedir al proveedor</span>
+    <span class="chip"><i style="background:var(--al)"></i>Recibir</span>
+    <span class="chip"><i style="background:#0EA5E9"></i>Entregar</span>
+    <span class="chip"><i style="background:var(--ok)"></i>Entregado</span>
+  </div>
+  <div class="fila" style="flex-wrap:wrap">
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12l1 13H5L6 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>Pedidos</span>
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V10l6 4V10l6 4V5h6v16z"/></svg>Proveedores</span>
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario</span>
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Dex</span>
+  </div>
+  <p style="color:var(--ts)">Trazo 2, puntas redondeadas. El color de cada etapa se repite en la tabla, el tablero y el calendario.</p>
+</section>
+
+<!-- 12 Aplicación web -->
+<section class="l degradado" id="s12" style="padding:60px 110px;align-items:center">
+  <span class="et">Aplicación · escritorio</span>
+  <img class="cap" src="../capturas/01-inicio.png" style="height:700px">
+</section>
+
+<!-- 13 App en el celular -->
+<section class="l grafito" id="s13" style="flex-direction:row;align-items:center;gap:80px">
+  <img class="cap" src="../capturas/08-celular.png" style="height:760px">
+  <div><span class="et">Aplicación · celular</span><h2 style="margin-top:20px">Se instala como app</h2><p style="margin-top:20px">Funciona sin conexión y se sincroniza con la compu del local. El ícono es la T sobre grafito.</p>
+  <div class="iso" style="--s:130px;margin-top:40px;--bg:#1A1C22"></div></div>
+</section>
+
+<!-- 14 Piezas -->
+<section class="l claro" id="s14" style="flex-direction:row;align-items:center;gap:40px">
+  <div style="width:400px;height:500px;border-radius:28px;background:var(--b);color:#fff;padding:36px;display:flex;flex-direction:column;justify-content:space-between">
+    <div class="iso" style="--s:70px;--bg:#1A1C22"></div>
+    <div style="font-family:'Space Grotesk';font-size:44px;font-weight:700;line-height:1.05">Pedido #128 listo para retirar.</div>
+    <div style="font-size:22px;font-weight:800;color:#C9A6FF">Saldo: $ 80.000 · ¡gracias!</div>
+  </div>
+  <div style="width:400px;height:500px;border-radius:28px;background:var(--g);color:#fff;padding:36px;display:flex;flex-direction:column;justify-content:space-between">
+    <span class="et">Comprobante</span>
+    <div style="font-family:'Space Grotesk';font-size:72px;font-weight:700;line-height:1;white-space:nowrap">$ 230.000</div>
+    <div style="font-size:26px;font-weight:700">40 vasos personalizados · seña $ 115.000</div>
+  </div>
+  <div><span class="et">Piezas</span><h2 style="margin-top:20px;font-size:52px">Mensajes y comprobantes</h2><p style="margin-top:16px;font-size:22px">El grafito para avisar; el degradado para el dinero.</p></div>
+</section>
+
+<!-- 15 Cierre -->
+<section class="l grafito" id="s15" style="align-items:center;text-align:center">
+  <div class="halo" style="width:800px;height:800px;left:300px;top:50px;background:radial-gradient(circle,rgba(139,61,255,.35),transparent 65%)"></div>
+  <div class="iso" style="--s:200px;--bg:#1A1C22;position:relative"></div>
+  <h2 style="position:relative">Gracias</h2>
+  <p style="position:relative;color:#C9A6FF;font-weight:800">Tradex · Identidad y diseño: Virginia Ponce</p>
+</section>
+
+<script>
+// Rellena los isotipos vacíos con la T (blanca en los monocromos) y numera las láminas.
+const t = document.getElementById('t').innerHTML, tb = document.getElementById('tb').innerHTML;
+document.querySelectorAll('.iso').forEach((e) => { if (!e.innerHTML.trim()) e.innerHTML = e.classList.contains('mono') ? tb : t; });
+document.querySelectorAll('.l').forEach((l, i) => { if (i && i < 14) l.insertAdjacentHTML('beforeend', `<span class="n">${String(i + 1).padStart(2, '0')}</span>`); });
+</script>
+</body></html>
