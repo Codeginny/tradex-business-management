@@ -213,7 +213,7 @@ export const DEFAULT_SETTINGS = {
   iibb: 0, // % de retención de Ingresos Brutos, si te la aplican (revisalo en tus extractos)
   extraHolidays: [],
   waTemplates: [
-    { name: "Pedido listo", text: "Hola {nombre}! ❤️ Te quería avisar que mañana estaría listo tu pedido, lo podés retirar por {retiro}. Avisame a qué hora te viene mejor 😊" },
+    { name: "Pedido listo", text: "Hola {nombre}! 💜 Te quería avisar que mañana estaría listo tu pedido, lo podés retirar por {retiro}. Avisame a qué hora te viene mejor 😊" },
     { name: "Recordar saldo", text: "Hola {nombre}! ¿Cómo estás? Te recuerdo que el saldo de tu pedido es de {saldo}. Podés transferir al alias que te pasé. ¡Gracias! ✨" },
     { name: "Pedido despachado", text: "Hola {nombre}! Tu pedido ya fue despachado 📦 Apenas tenga el número de seguimiento te lo paso." },
     { name: "Confirmar seña", text: "Hola {nombre}! Recibí tu seña de {sena} 🙌 Tu pedido para el {evento} ya está en marcha. Total {total}, saldo {saldo}." },

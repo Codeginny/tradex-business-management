@@ -71,7 +71,7 @@ function calc(el) {
       <label class="field">Unidades (para empaque y etiquetas)<input type="number" id="k-qty" min="0" value="1"></label>
       <label class="field">% de ganancia deseado<input type="number" id="k-pct" min="0" placeholder="Automático: ${s.markup}% (o ${s.markupHigh}% si supera ${money(s.markupThreshold)})"></label>
     </div>
-    <div class="card"><h3>❤️ Precio al cliente</h3><div class="price-box" id="k-out"></div></div>
+    <div class="card"><h3>💜 Precio al cliente</h3><div class="price-box" id="k-out"></div></div>
   </div>`;
   const draw = () => {
     const cost = Number($("#k-cost", el).value) || 0, ship = Number($("#k-ship", el).value) || 0, qty = Number($("#k-qty", el).value) || 0;

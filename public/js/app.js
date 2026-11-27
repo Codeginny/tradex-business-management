@@ -39,7 +39,7 @@ const ROUTES = [
   { path: "estadisticas", label: "Estadísticas", icon: "chart", palette: "aqua", group: "Agenda y finanzas", view: stats },
   { path: "ajustes", label: "Ajustes", icon: "cog", palette: "violet", group: null, view: config },
 ];
-const GROUP_COLOR = { "Pedidos y clientes": "#ff3b4e", "Proveedores e insumos": "#ff3b4e", "Agenda y finanzas": "#ff3b4e", "Finanzas personales": "#ff3b4e" };
+const GROUP_COLOR = { "Pedidos y clientes": "#8b3dff", "Proveedores e insumos": "#8b3dff", "Agenda y finanzas": "#8b3dff", "Finanzas personales": "#8b3dff" };
 const MOBILE = ["", "pedidos", "productos", "cuotas", "calendario"];
 
 let current = null;
@@ -127,7 +127,7 @@ export function render() {
   const { route, params } = current;
   document.documentElement.dataset.palette = route.palette;
   const meta = document.querySelector('meta[name="theme-color"]');
-  meta.content = "#ff3b4e";
+  meta.content = "#8b3dff";
   const view = $("#view");
   const head = route.view.render(view, params) || {};
   $("#page-title").textContent = head.title || route.label;

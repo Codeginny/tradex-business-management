@@ -125,7 +125,7 @@ export const statusOf = (k) => STATUSES.find((s) => s.key === k) || STATUSES[0];
 export const statusKey = (k) => (STATUSES.some((s) => s.key === k) ? k : "pedir");
 // Cada estado tiene su fondo y una letra que contrasta
 // solo Pedir (rojo) y Recibir (morado) tienen fondo; Entregar y Entregado van sin color
-const ST_BG = { pedir: "background-color:#dc2626;color:#fff;border-color:#dc2626", esperando: "background-color:#5f6470;color:#fff;border-color:#5f6470" };
+const ST_BG = { pedir: "background-color:#f97316;color:#fff;border-color:#f97316", esperando: "background-color:#5f6470;color:#fff;border-color:#5f6470" };
 export const statusStyle = (k) => ST_BG[statusKey(k)] || "background-color:transparent;color:inherit";
 export const statusPill = (k, label) => `<span class="st-pill" style="${statusStyle(k)}">${esc(label || statusOf(k).label)}</span>`;
 export const BEFORE_SUPPLIER = ["senado", "pagado", "disenar", "pagar", "pedir"];

@@ -210,7 +210,7 @@ function resumen(el, again) {
 
   el.innerHTML = `<div class="stack">
     <div class="grid g4">
-      <div class="card stat"><span class="label">💵 Ingresos</span><span class="value" style="color:var(--ok)">${money(m.income)}</span><span class="hint">❤️ ganancia de Tradex</span></div>
+      <div class="card stat"><span class="label">💵 Ingresos</span><span class="value" style="color:var(--ok)">${money(m.income)}</span><span class="hint">💜 ganancia de Tradex</span></div>
       <div class="card stat"><span class="label">📌 Gastos fijos</span><span class="value">${money(m.fixedTotal)}</span><span class="hint">pagaste ${money(m.fixedPaidTotal)} · faltan ${pendingFixed.length}</span></div>
       <div class="card stat"><span class="label">🧾 Gastos del día</span><span class="value">${money(m.varTotal)}</span><span class="hint">${m.vars.length} gastos ${deltaTxt(varDelta)}</span></div>
       <div class="card stat"><span class="label">${m.income ? "⚖️ Te queda" : "💸 Total gastado"}</span><span class="value" style="color:${m.income && m.income - m.out < 0 ? "var(--u-red)" : "inherit"}">${money(m.income ? m.income - m.out : m.out)}</span><span class="hint">${m.income ? `gastaste ${money(m.out)}` : ""} ${deltaTxt(outDelta)}</span></div>
@@ -374,7 +374,7 @@ function bindChart(el, hist) {
       cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.style.display = "";
       tip.innerHTML = `<b style="text-transform:capitalize">${mLabel(h.k)}</b>
         <div><i class="pf-sw inc"></i>Ingresos <b>${money(h.income)}</b></div>
-        <div class="muted" style="padding-left:22px">❤️ Tradex ${money(h.incomeOrders)}${h.incomeOther ? ` · otros ${money(h.incomeOther)}` : ""}</div>
+        <div class="muted" style="padding-left:22px">💜 Tradex ${money(h.incomeOrders)}${h.incomeOther ? ` · otros ${money(h.incomeOther)}` : ""}</div>
         <div><i class="pf-sw out"></i>Egresos <b>${money(h.out)}</b></div>
         <div class="muted" style="padding-left:22px">fijos ${money(h.fixedTotal)} · del día ${money(h.varTotal)}</div>
         <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">Balance <b style="color:${h.income - h.out < 0 ? "var(--u-red)" : "var(--ok)"}">${money(h.income - h.out)}</b></div>`;
@@ -684,10 +684,10 @@ function ingresos(el, again) {
   const tOrders = sum(cobros, (c) => c.amount), tGross = sum(cobros, (c) => c.gross);
   el.innerHTML = `<div class="stack">
     <div class="grid g2">
-      <div class="card stat"><span class="label">❤️ Ganancia de pedidos</span><span class="value">${money(tOrders)}</span><span class="hint">cobraste ${money(tGross)} − costos de proveedor ${money(tGross - tOrders)}</span></div>
+      <div class="card stat"><span class="label">💜 Ganancia de pedidos</span><span class="value">${money(tOrders)}</span><span class="hint">cobraste ${money(tGross)} − costos de proveedor ${money(tGross - tOrders)}</span></div>
       <div class="card stat"><span class="label">Te quedó neto en ${mLabel(month)}</span><span class="value" style="color:var(--ok)">${money(tOrders)}</span></div>
     </div>
-    <div class="card"><h3>❤️ Ganancia de pedidos de Tradex <span class="small muted" style="font-weight:500">· de cada seña o saldo, lo que te queda después de pagar al proveedor</span></h3>
+    <div class="card"><h3>💜 Ganancia de pedidos de Tradex <span class="small muted" style="font-weight:500">· de cada seña o saldo, lo que te queda después de pagar al proveedor</span></h3>
       ${cobros.some((c) => c.noCost) ? `<p class="small" style="margin-top:0">⚠️ Hay pedidos sin costo cargado: ahí la ganancia figura igual a lo cobrado. Cargá el costo en el pedido para que sea real.</p>` : ""}
       ${cobros.length ? `<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Pedido</th><th>Qué</th><th>Medio</th><th class="right">Cobrado</th><th class="right">Ganancia</th><th></th></tr></thead><tbody>
         ${cobros.map((c) => `<tr><td class="nowrap">${fmtDate(c.date)}</td><td><b>${esc(c.name)}</b></td><td class="small">${esc(itemsText(c.o)) || "—"}</td><td><span class="chip ${c.label === "Seña" ? "accent" : "ok"}">${c.label}</span></td><td class="small">${esc(c.method || "—")}</td><td class="right muted">${money(c.gross)}</td><td class="right"><b style="color:var(--ok)">${money(c.amount)}</b>${c.noCost ? ` <span title="Pedido sin costo cargado">⚠️</span>` : ""}</td><td><a class="btn ghost sm" href="#/pedidos?id=${c.o.id}">Ver</a></td></tr>`).join("")}

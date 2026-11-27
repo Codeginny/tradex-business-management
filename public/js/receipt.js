@@ -17,7 +17,7 @@ export function printHTML(title, inner) {
     .head { background: #121317; color: #fff; border-radius: 18px; padding: 22px 26px; display: flex; justify-content: space-between; align-items: center; }
     .logo { font-size: 30px; font-weight: 800; letter-spacing: .18em; }
     .head small { opacity: .9; display: block; }
-    h2 { font-size: 15px; color: #c8102e; margin: 22px 0 8px; text-transform: uppercase; letter-spacing: .08em; }
+    h2 { font-size: 15px; color: #5b1fd6; margin: 22px 0 8px; text-transform: uppercase; letter-spacing: .08em; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; font-size: 14px; }
     .grid b { color: #6c6483; font-weight: 600; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -26,7 +26,7 @@ export function printHTML(title, inner) {
     .r { text-align: right; }
     .totals { margin-left: auto; width: 300px; margin-top: 14px; font-size: 15px; }
     .totals div { display: flex; justify-content: space-between; padding: 5px 0; }
-    .totals .big { font-size: 20px; font-weight: 800; color: #c8102e; border-top: 2px dashed #ffc2c9; margin-top: 6px; padding-top: 10px; }
+    .totals .big { font-size: 20px; font-weight: 800; color: #5b1fd6; border-top: 2px dashed #d9c4ff; margin-top: 6px; padding-top: 10px; }
     .totals .saldo { background: #fdf2f8; color: #be185d; border-radius: 10px; padding: 8px 10px; font-weight: 800; }
     .dates { display: flex; gap: 12px; margin-top: 18px; }
     .dates div { flex: 1; background: #f6f4fb; border-radius: 14px; padding: 12px 14px; }
@@ -74,6 +74,6 @@ export function printReceipt(o) {
       <div><b>Entrega aproximada</b><span>${o.deadline ? fmtDate(o.deadline, { long: true }) : "—"}</span></div>
     </div>
     ${o.notes ? `<div class="note"><b>Notas:</b> ${esc(o.notes)}</div>` : ""}
-    <div class="foot">¡Gracias por elegirnos! ❤️ · ${esc(s.businessName || "TRADEX")}</div>`;
+    <div class="foot">¡Gracias por elegirnos! 💜 · ${esc(s.businessName || "TRADEX")}</div>`;
   printHTML(`Comprobante ${o.client?.name || ""}`, html);
 }

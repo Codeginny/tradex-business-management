@@ -71,7 +71,7 @@ export function openAssistant(listen = false) {
   $("#as-tts").onclick = () => { S.tts = !S.tts; localStorage.setItem("v-tts", S.tts ? "1" : "0"); $("#as-tts").style.opacity = S.tts ? 1 : 0.5; if (!S.tts) speechSynthesis?.cancel(); };
   $("#as-form").onsubmit = (e) => { e.preventDefault(); const v = $("#as-text").value.trim(); if (v) { $("#as-text").value = ""; S.handsFree = false; send(v); } };
   if ($("#as-mic")) $("#as-mic").onclick = () => { if (S.listening) { S.handsFree = false; stopListening(); } else { S.handsFree = true; startListening(); } };
-  if (!S.messages.length) botSay(`¡Hola! Soy Dex ❤️ Contame qué pasó: “Sofía me compró 40 tazas para el sábado 20”, “Insumos Sur vende ecovasos a 1300” o “pasame las 3 botellas más baratas”.`, { silent: true });
+  if (!S.messages.length) botSay(`¡Hola! Soy Dex 💜 Contame qué pasó: “Sofía me compró 40 tazas para el sábado 20”, “Insumos Sur vende ecovasos a 1300” o “pasame las 3 botellas más baratas”.`, { silent: true });
   else drawMessages();
   drawDraft();
   drawSuggestions();
@@ -132,7 +132,7 @@ function botSay(text, { html = "", silent = false } = {}) {
 function speak(text) {
   if (!S.tts || !("speechSynthesis" in window)) { if (S.handsFree && S.intent !== "none") setTimeout(startListening, 300); return; }
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text.replace(/[❤️✨🛍️📌🏭✅⚠️🔎]/gu, ""));
+  const u = new SpeechSynthesisUtterance(text.replace(/[💜✨🛍️📌🏭✅⚠️🔎]/gu, ""));
   u.lang = "es-AR";
   const voices = speechSynthesis.getVoices();
   u.voice = voices.find((v) => v.lang === "es-AR") || voices.find((v) => v.lang === "es-US") || voices.find((v) => v.lang?.startsWith("es")) || null;

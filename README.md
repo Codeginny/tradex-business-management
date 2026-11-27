@@ -97,4 +97,4 @@ public/js/views/     una vista por sección
 
 ## Marca
 
-Grafito con **rojo señal `#FF3B4E`** como único acento; tipografías Space Grotesk y Manrope.
+Grafito y gris frío con un **degradado violeta → morado** (`#6C2BFF` → `#B44CFF`); tipografías Space Grotesk y Manrope.

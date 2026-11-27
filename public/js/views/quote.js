@@ -175,7 +175,7 @@ export function render(el) {
         <label class="field">Otro % (opcional)<input type="number" id="q-mk" min="0" value="${state.manualMarkup}" placeholder="Automático"></label>
       </div>
     </div>
-    <div class="card" style="position:sticky;top:90px"><h3>❤️ Resultado</h3><div class="price-box" id="q-result"></div></div>
+    <div class="card" style="position:sticky;top:90px"><h3>💜 Resultado</h3><div class="price-box" id="q-result"></div></div>
   </div>
   <div class="card" style="margin-top:18px"><div class="card-head"><h3>📚 Historial de cotizaciones</h3><span class="small muted">${db.all("quotes").length} guardadas</span></div>
     <div class="search" style="margin-bottom:10px">${icon("search")}<input type="search" id="q-hsearch" value="${esc(state.hq)}" placeholder="Buscar por cliente, producto, proveedor o fecha (ej: Sofía, mochila, 16/11)…"></div>
