@@ -9,7 +9,7 @@ export function guessCategory(name) {
   // primero tus categorías propias ("Llaveros" reconoce "llavero acrílico")
   const own = categories().find((c) => c.length > 3 && n.includes(c.toLowerCase().replace(/(es|s)$/, "")));
   if (own) return own;
-  const rules = [["Tazas", /taza|mug|jarro/], ["Vasos", /eco ?vaso|vaso/], ["Botellas", /botell|termo|caramagnola/], ["Velas", /vela|aroma/], ["Skincare", /skin|crema|serum|jab[oó]n|kit facial/], ["Mochilas", /mochila/], ["Difusor", /difusor/], ["Llaveros", /llavero/]];
+  const rules: [string, RegExp][] = [["Tazas", /taza|mug|jarro/], ["Vasos", /eco ?vaso|vaso/], ["Botellas", /botell|termo|caramagnola/], ["Velas", /vela|aroma/], ["Skincare", /skin|crema|serum|jab[oó]n|kit facial/], ["Mochilas", /mochila/], ["Difusor", /difusor/], ["Llaveros", /llavero/]];
   // solo sugiere categorías que existen en tu lista; si no reconoce el producto la deja vacía
   const list = categories();
   return rules.find(([c, r]) => list.includes(c) && r.test(n))?.[0] || "";
@@ -59,7 +59,7 @@ document.addEventListener("change", async (e) => {
   const name = await askNewCategory();
   if (!name) { sel.value = prev; return; }
   if (![...sel.options].some((o) => o.value === name)) sel.insertAdjacentHTML("beforeend", `<option value="${esc(name)}">${esc(name)}</option>`);
-  sel.value = name;
+  sel.value = name as string;
   sel.dispatchEvent(new Event("change", { bubbles: true }));
 }, true);
 document.addEventListener("focusin", (e) => { if (e.target instanceof HTMLSelectElement) e.target.dataset.prev = e.target.value; });

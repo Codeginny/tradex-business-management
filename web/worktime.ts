@@ -13,12 +13,12 @@ const deviceId = (() => {
 const minuteNow = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
 const docId = (day) => `${day}_${deviceId}`;
 
-let mine = { day: today(), minutes: new Set() };
+let mine = { day: today(), minutes: new Set<number>() };
 let lastSave = 0;
 
 function load(day) {
   const doc = db.get("worklog", docId(day));
-  return { day, minutes: new Set(doc?.minutes || []) };
+  return { day, minutes: new Set<number>(doc?.minutes || []) };
 }
 async function save(force = false) {
   if (!force && Date.now() - lastSave < 5 * 60 * 1000) return; // se guarda cada 5 minutos

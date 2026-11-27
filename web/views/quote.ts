@@ -13,7 +13,7 @@ const quickProduct = (l, i) => ({ id: "", name: l.quick.name || "Producto rápid
 const supName = (sid, rows) => db.get("suppliers", sid)?.name || rows.find((r) => r.p.supplierId === sid)?.p.supplierName || "";
 import { openOrderForm } from "./orders.js";
 
-const state = { lines: [{ productId: "", qty: 1 }], hidden: null, matrix: {}, manualMarkup: "", name: "", hq: "", shipOver: {} };
+const state: Rec = { lines: [{ productId: "", qty: 1 }], hidden: null, matrix: {}, manualMarkup: "", name: "", hq: "", shipOver: {} };
 
 // Suma un producto elegido en "Productos" a la cotización (reemplaza el renglón vacío si lo hay)
 export function addToQuote(productId, qty = 1) {
@@ -22,14 +22,14 @@ export function addToQuote(productId, qty = 1) {
   if (prev) prev.qty = Number(qty) || prev.qty; else state.lines.push({ productId, qty: Number(qty) || 1 });
 }
 
-export function computeQuote(lines, { hiddenKeys, matrix = {}, manualMarkup, shipOver = {} } = {}) {
+export function computeQuote(lines, { hiddenKeys, matrix = {}, manualMarkup, shipOver = {} }: Rec = {}) {
   const s = settings();
   hiddenKeys ??= s.hidden.filter((h) => h.on).map((h) => h.key);
   const rows = lines.map((l, i) => ({ ...l, p: l.quick ? quickProduct(l, i) : db.get("products", l.productId) })).filter((l) => l.p && l.qty > 0 && (!l.quick || l.p.price));
   const goods = rows.reduce((a, l) => a + unitCostFor(l.p, l.qty) * l.qty, 0);
   const qty = rows.reduce((a, l) => a + Number(l.qty), 0);
   // un envío por proveedor (el mayor de sus productos)
-  const shipBySup = {};
+  const shipBySup: Rec = {};
   rows.forEach((l) => { const k = l.p.supplierId || "_"; shipBySup[k] = Math.max(shipBySup[k] || 0, productShipping(l.p)); });
   // si ella escribió cuánto le cobraron de envío, manda eso
   Object.keys(shipBySup).forEach((k) => { if (shipOver[k] !== "" && shipOver[k] != null) shipBySup[k] = Number(shipOver[k]) || 0; });
@@ -133,7 +133,7 @@ export function render(el) {
         if (sp?.phone && !l.quick.phone) l.quick.phone = sp.phone;
       }
       // se redibuja después de que el cursor pasó al campo siguiente, y se lo deja ahí
-      setTimeout(() => { const f = document.activeElement, key = f?.dataset?.q != null ? `[data-q="${f.dataset.q}"][data-k="${f.dataset.k}"]` : f?.dataset?.l != null ? `[data-l="${f.dataset.l}"][data-k="${f.dataset.k}"]` : ""; draw(); if (key) $(key, el)?.focus(); }, 0);
+      setTimeout(() => { const f = document.activeElement as HTMLElement, key = f?.dataset?.q != null ? `[data-q="${f.dataset.q}"][data-k="${f.dataset.k}"]` : f?.dataset?.l != null ? `[data-l="${f.dataset.l}"][data-k="${f.dataset.k}"]` : ""; draw(); if (key) $(key, el)?.focus(); }, 0);
     }));
     $$("[data-save-q]", el).forEach((b) => (b.onclick = async () => {
       const l = state.lines[b.dataset.saveQ], qk = l.quick;

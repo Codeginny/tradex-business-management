@@ -23,7 +23,7 @@ import * as personal from "./views/personal.js";
 import * as config from "./views/settings.js";
 
 // Cada apartado tiene su paleta: violeta (pedidos), rosa-fucsia (proveedores), celeste-agua (agenda y finanzas), verde (finanzas personales)
-const ROUTES = [
+const ROUTES: Rec[] = [
   { path: "personal", label: "Finanzas personales", icon: "piggy", palette: "green", group: "Finanzas personales", view: personal },
   { path: "", label: "Inicio", icon: "home", palette: "violet", group: "Pedidos y clientes", view: dashboard },
   { path: "pedidos", label: "Pedidos", icon: "bag", palette: "violet", group: "Pedidos y clientes", view: orders },
@@ -127,7 +127,7 @@ export function render() {
   const { route, params } = current;
   document.documentElement.dataset.palette = route.palette;
   const meta = document.querySelector('meta[name="theme-color"]');
-  meta.content = "#8b3dff";
+  (meta as HTMLMetaElement).content = "#8b3dff";
   const view = $("#view");
   const head = route.view.render(view, params) || {};
   $("#page-title").textContent = head.title || route.label;
@@ -145,7 +145,7 @@ function rerenderSoon(col) {
   pending = setTimeout(() => {
     // no redibujar si la persona está escribiendo en la vista
     const a = document.activeElement;
-    if (a?.closest("#view") && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && !["checkbox", "radio"].includes(a.type)) return;
+    if (a?.closest("#view") && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && !["checkbox", "radio"].includes((a as HTMLInputElement).type)) return;
     render();
     renderNav();
   }, 60);
@@ -155,7 +155,7 @@ async function start() {
   initMoneyInputs();
   // DNI o CUIL: los guiones del CUIT se ponen solos mientras escribís
   document.addEventListener("input", (e) => {
-    const i = e.target;
+    const i = e.target as HTMLInputElement;
     if (!i.matches?.('input[name="dni"], input[name="c_dni"]')) return;
     const v = typingDni(i.value);
     if (v !== i.value) { i.value = v; i.setSelectionRange(v.length, v.length); }
@@ -184,7 +184,7 @@ async function start() {
   window.addEventListener("offline", () => { renderNet(); });
   db.onChange(rerenderSoon);
   document.addEventListener("tradex-worktime", () => document.querySelectorAll(".work-slot").forEach((el) => (el.innerHTML = workChip())));
-  document.addEventListener("click", (e) => { if (e.target.closest("[data-eod]")) endOfDay(); });
+  document.addEventListener("click", (e) => { if ((e.target as Element).closest("[data-eod]")) endOfDay(); });
   let pinWarned = false;
   onSyncChange((s) => {
     renderNet();

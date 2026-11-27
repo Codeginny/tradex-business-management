@@ -4,10 +4,21 @@
   "description": "TRADEX - Sistema de gestión del negocio",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "build": "tsc -p tsconfig.web.json && tsc -p tsconfig.sw.json",
+    "prestart": "npm run build",
+    "start": "node server.ts",
+    "predev": "npm run build",
+    "dev": "node --watch server.ts",
+    "typecheck": "tsc && tsc -p tsconfig.web.json --noEmit && tsc -p tsconfig.sw.json --noEmit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.7",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }

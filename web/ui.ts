@@ -1,15 +1,16 @@
 // Piezas de interfaz reutilizables: modal, toasts, confirmación, lectura de formularios.
 import { icon, esc } from "./utils.js";
 
-const $ = (s, el = document) => el.querySelector(s);
+// Búsquedas en el DOM: devuelven any porque cada vista sabe qué tipo de elemento pidió.
+const $ = (s: string, el: ParentNode = document): any => el.querySelector(s);
 export { $ };
-export const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+export const $$ = (s: string, el: ParentNode = document): any[] => [...el.querySelectorAll(s)];
 
 // Formularios abiertos con cambios sin guardar (para avisar antes de cerrar o recargar la página)
 const dirtyModals = new Set();
 window.addEventListener("beforeunload", (e) => { if (dirtyModals.size) { e.preventDefault(); e.returnValue = ""; } });
 
-export function modal({ title, body, foot = "", wide = false, onMount, onClose }) {
+export function modal({ title, body, foot = "", wide = false, onMount, onClose }: Rec) {
   const root = $("#modal-root");
   const wrap = document.createElement("div");
   wrap.className = "modal-back";
@@ -38,7 +39,7 @@ export function modal({ title, body, foot = "", wide = false, onMount, onClose }
     close();
   };
   const onKey = (e) => { if (e.key === "Escape" && root.lastElementChild === wrap) tryClose(); };
-  wrap.addEventListener("click", (e) => { if (e.target === wrap || e.target.closest("[data-close]")) tryClose(); });
+  wrap.addEventListener("click", (e) => { if (e.target === wrap || (e.target as Element).closest("[data-close]")) tryClose(); });
   document.addEventListener("keydown", onKey);
   root.appendChild(wrap);
   const api = { el: wrap, close, tryClose, isDirty: () => dirtyModals.has(wrap) };
@@ -46,7 +47,7 @@ export function modal({ title, body, foot = "", wide = false, onMount, onClose }
   return api;
 }
 
-export function confirmBox(text, okLabel = "Sí, continuar", { title = "¿Confirmás?", cancel = "Cancelar" } = {}) {
+export function confirmBox(text, okLabel = "Sí, continuar", { title = "¿Confirmás?", cancel = "Cancelar" }: Rec = {}) {
   return new Promise((resolve) => {
     const m = modal({
       title,
@@ -59,7 +60,7 @@ export function confirmBox(text, okLabel = "Sí, continuar", { title = "¿Confir
   });
 }
 
-export function toast(title, body = "", { urgent = false, ms = 5000, action } = {}) {
+export function toast(title, body = "", { urgent = false, ms = 5000, action }: Rec = {}) {
   const el = document.createElement("div");
   el.className = `toast ${urgent ? "urgent" : ""}`;
   el.innerHTML = `<div><div class="t">${esc(title)}</div>${body ? `<div class="b">${esc(body)}</div>` : ""}
@@ -74,7 +75,7 @@ export function toast(title, body = "", { urgent = false, ms = 5000, action } = 
 
 // Lee los campos [name] de un contenedor como objeto (números, checkboxes y fechas incluidos)
 export function readForm(el) {
-  const out = {};
+  const out: Rec = {};
   for (const f of $$("[name]", el)) {
     if (f.type === "checkbox") out[f.name] = f.checked;
     else if (f.type === "number" || f.dataset.money) out[f.name] = f.value === "" ? "" : Number(f.value);
@@ -96,7 +97,7 @@ export function stars(n = 0) {
 
 // Autocompletar: mientras escribís sugiere nombres (clientes, proveedores, productos).
 // source(q) devuelve [{ icon, label, sub, value }]. Al elegir, completa el campo y filtra.
-export function autocomplete(input, source, { onPick } = {}) {
+export function autocomplete(input, source, { onPick }: Rec = {}) {
   const wrap = input.parentElement;
   wrap.style.position = "relative";
   const box = document.createElement("div");
@@ -129,5 +130,5 @@ export function autocomplete(input, source, { onPick } = {}) {
     else if (e.key === "Enter" && idx >= 0) { e.preventDefault(); pick(idx); }
     else if (e.key === "Escape") close();
   });
-  box.addEventListener("mousedown", (e) => { const b = e.target.closest("[data-i]"); if (b) { e.preventDefault(); pick(Number(b.dataset.i)); } });
+  box.addEventListener("mousedown", (e) => { const b = (e.target as Element).closest<HTMLElement>("[data-i]"); if (b) { e.preventDefault(); pick(Number(b.dataset.i)); } });
 }

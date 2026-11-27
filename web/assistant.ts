@@ -15,7 +15,7 @@ let aiOn = false;
 export const aiAvailable = () => aiOn && navigator.onLine;
 // El dictado solo anda con Chrome en una conexión segura (localhost o https). En el celular por Wi-Fi (http://IP) no:
 // ahí Dex se usa escribiendo.
-export const voiceAvailable = () => !!(window.SpeechRecognition || window.webkitSpeechRecognition) && window.isSecureContext;
+export const voiceAvailable = () => !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) && window.isSecureContext;
 
 export async function api(path, body) {
   const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", ...pinHeader() }, body: JSON.stringify(body) });
@@ -121,7 +121,7 @@ function drawDraft() {
     <div class="kv">${Object.entries(labels).map(([k, l]) => `<span>${l}</span><span class="${lastChanged.has(k) ? "new" : ""}">${show(k, d[k]) || '<span class="muted">—</span>'}</span>`).join("")}</div>`;
 }
 
-function botSay(text, { html = "", silent = false } = {}) {
+function botSay(text, { html = "", silent = false }: Rec = {}) {
   S.messages.push({ role: "assistant", content: text, html: html ? `${esc(text)}${html}` : "" });
   drawMessages();
   if (!silent) speak(text);
@@ -142,7 +142,7 @@ function speak(text) {
 }
 
 function startListening() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
   if (!SR) { toast("Tu navegador no tiene reconocimiento de voz", "Usá Google Chrome (en la compu o Android). Mientras tanto podés escribir."); S.handsFree = false; return; }
   if (S.listening || S.busy) return;
   speechSynthesis?.cancel();
@@ -191,7 +191,7 @@ async function send(text) {
   try {
     turn = aiAvailable() ? await aiTurn() : localTurn(text);
   } catch (e) {
-    console.warn("IA no disponible, uso modo local:", e.message);
+    console.warn("IA no disponible, uso modo local:", (e as Error).message);
     turn = localTurn(text);
   }
   S.busy = false;
@@ -329,7 +329,7 @@ const nrm = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/\p{M}
 // rasgos que distinguen un producto de otro (para elegir el suelto y el combo correctos)
 const FEATS = { xl: /\bxl\b|grande|maxi/, masa: /masa|cortante|amasar/, palo: /amasar|palo|palito/, lavable: /lavable|prueba de agua|agua/, glitter: /glitter/ };
 const feats = (t) => new Set(Object.keys(FEATS).filter((k) => FEATS[k].test(nrm(t))));
-const KINDS = [["vaso", /vaso|milkshake|milk shake/], ["valija", /valij|valija/], ["lunchera", /lunch|lonch/], ["bolsita", /bolsit/]];
+const KINDS: [string, RegExp][] = [["vaso", /vaso|milkshake|milk shake/], ["valija", /valij|valija/], ["lunchera", /lunch|lonch/], ["bolsita", /bolsit/]];
 const kindOf = (t) => KINDS.find(([, re]) => re.test(nrm(t)))?.[0];
 
 function answerCombos(text) {
@@ -468,7 +468,7 @@ export function parseDateES(text, base = today()) {
   }
   return "";
 }
-const diffWeek = (a, b) => Math.floor((parseISO(b) - parseISO(a)) / (7 * 86400000));
+const diffWeek = (a, b) => Math.floor((+parseISO(b) - +parseISO(a)) / (7 * 86400000));
 
 function detectIntent(t) {
   const x = t.toLowerCase();
@@ -505,7 +505,7 @@ function extractOrder(t, d) {
   for (const c of CHANNELS) if (new RegExp(`\\b${c.slice(0, 5)}`, "i").test(x) && /(vino|instagram|whats|recomend|facebook|por )/i.test(x)) d.channel = c;
   if (/recomend/i.test(x)) d.channel = "Recomendación";
   if (/retir/i.test(x)) d.shipping = "Retiro en local"; else if (/\b(moto|uber|cadete)\b/i.test(x)) d.shipping = "Moto/Uber"; else if (/\bcorreo\b/i.test(x) && !/argentino/i.test(x)) d.shipping = "Correo";
-  for (const [c, r] of [["Andreani", /andreani/i], ["Flecha Bus Cargas", /flecha/i], ["Via Cargo", /v[ií]a ?cargo/i], ["Correo Argentino", /correo argentino/i]]) if (r.test(x)) d.courier = c;
+  for (const [c, r] of <[string, RegExp][]>[["Andreani", /andreani/i], ["Flecha Bus Cargas", /flecha/i], ["Via Cargo", /v[ií]a ?cargo/i], ["Correo Argentino", /correo argentino/i]]) if (r.test(x)) d.courier = c;
   if ((m = x.match(/(?:nota|quiere que|que sea|anot[aá] que)\s*:?\s*(.+)$/i))) d.notes = m[1].trim();
 }
 

@@ -20,7 +20,7 @@ const catLabel = (name) => `${catOf(name)?.emoji || "📦"} ${name || "Otros"}`;
 const catColor = (name) => { const c = catOf(name); return c && c.slot != null && c.slot !== "" ? `var(--cat-${c.slot})` : "var(--cat-gray)"; };
 const INCOME_SRC = ["Sueldo", "Trabajo extra", "Otro"]; // lo de Tradex entra solo desde los pedidos
 // Palabras que eligen la categoría sola cuando escribís la descripción
-const AUTO_CAT = [
+const AUTO_CAT: [RegExp, string][] = [
   [/super|chino|almac|verdu|carni|mercado/i, "Supermercado"],
   [/telekino|quini|loto|lotería|loteria|raspadita/i, "Telekino"],
   [/lomit|pizza|empanad|merienda|desay|cafe|café|almuerz|cena|delivery|helad|comida|hambur|sanguch|medialuna|facturas/i, "Comida"],
@@ -242,13 +242,13 @@ function resumen(el, again) {
 // ---------- torta (dona) de gastos comunes por categoría ----------
 function donut(vars) {
   if (!vars.length) return `<p class="muted">Todavía no anotaste gastos comunes en ${mLabel(month)}.</p>`;
-  const by = {};
+  const by: Rec = {};
   for (const e of vars) {
     const c = catOf(e.category);
     const key = c && c.slot != null && c.slot !== "" ? c.name : "Otras"; // las grises se juntan
     by[key] = (by[key] || 0) + (Number(e.amount) || 0);
   }
-  const slices = Object.entries(by).sort((a, b) => (a[0] === "Otras") - (b[0] === "Otras") || b[1] - a[1]);
+  const slices = Object.entries(by).sort((a, b) => +(a[0] === "Otras") - +(b[0] === "Otras") || (b[1] as number) - (a[1] as number));
   const total = sum(slices, (x) => x[1]);
   const R = 80, r = 50, C = 100;
   let ang = -Math.PI / 2;
@@ -289,10 +289,10 @@ function compareCard(m, prev) {
   const cur = mShort(month), old = mShort(pk);
   const byCat = (t) => t.vars.reduce((a, e) => ((a[e.category || "Otros"] = (a[e.category || "Otros"] || 0) + (Number(e.amount) || 0)), a), {});
   const a = byCat(m), b = byCat(prev);
-  const rows = [
+  const rows: Rec[] = [
     { name: "📌 Gastos fijos", now: m.fixedTotal, before: prev.fixedTotal, fixed: true },
     ...[...new Set([...Object.keys(a), ...Object.keys(b)])].map((c) => ({ name: c, now: a[c] || 0, before: b[c] || 0 })),
-  ].sort((x, y) => (y.fixed - x.fixed) || (y.now - x.now) || (y.before - x.before));
+  ].sort((x: Rec, y: Rec) => (y.fixed - x.fixed) || (y.now - x.now) || (y.before - x.before));
   const diffCell = (r) => {
     const d = r.now - r.before;
     if (!d) return `<span class="muted">igual</span>`;
@@ -419,7 +419,7 @@ function fijos(el, again) {
   // calendario del mes con los vencimientos
   const [y, mo] = month.split("-").map(Number);
   const lead = (new Date(y, mo - 1, 1).getDay() + 6) % 7;
-  const byDay = {};
+  const byDay: Rec = {};
   for (const f of m.fixed) { const d = fixedDue(f, month); if (d) (byDay[Number(d.slice(8))] ||= []).push(f); }
   const t = today();
   el.innerHTML = `<div class="stack">${mustPayBanner()}
@@ -526,7 +526,7 @@ function bindQuick(el, kind, again) {
 
 function movesList(list, kind, mk = month) {
   if (!list.length) return `<div class="empty"><div class="big">${kind === "expense" ? "🧾" : "💵"}</div><p>Nada anotado en ${mLabel(mk)}.</p></div>`;
-  const byDate = {};
+  const byDate: Rec = {};
   for (const x of [...list].sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.createdAt || "").localeCompare(a.createdAt || ""))) (byDate[x.date || ""] ||= []).push(x);
   return Object.entries(byDate).map(([d, xs]) => `<div class="pf-daygroup"><div class="pf-dayhead"><span>${d ? fmtDate(d, { long: true }) : "Sin fecha"}</span><span>${money(sum(xs, (x) => x.amount))}</span></div>
     ${xs.map((x) => `<div class="pf-line"><div><b>${esc(x.note || x.category)}</b> <span class="chip pf-catchip" style="--c:${catColor(x.category)}">${esc(x.kind === "income" ? x.category || "" : catLabel(x.category))}</span></div>
@@ -556,7 +556,7 @@ function moveModal(x) {
 }
 
 // Anotar un gasto desde cualquier pestaña (botón de arriba) o en un mes puntual (un gasto que te olvidaste)
-function expenseModal({ mk } = {}) {
+function expenseModal({ mk }: Rec = {}) {
   const past = mk && mk !== monthKey(today());
   const last = mk ? `${mk}-${String(daysIn(mk)).padStart(2, "0")}` : "";
   modal({
@@ -735,7 +735,7 @@ function loanRow(l) {
 }
 
 // byPerson: junta los préstamos de la misma persona y, si son 2 o más, suma abajo cuánto le debés en total
-function loanTable(list, { byPerson = false } = {}) {
+function loanTable(list, { byPerson = false }: Rec = {}) {
   let body = list.map(loanRow).join("");
   if (byPerson) {
     const groups = new Map();
@@ -835,7 +835,7 @@ function prestamos(el, again) {
   bindLoans(el, again);
 }
 
-function loanModal(l = null, preset = {}) {
+function loanModal(l = null, preset: Rec = {}) {
   const x = l || { date: today(), lender: "", ...preset };
   modal({
     title: l ? "Editar préstamo" : "🤝 Anotar préstamo",

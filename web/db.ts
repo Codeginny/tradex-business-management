@@ -8,7 +8,7 @@ export const COLLECTIONS = ["orders", "clients", "suppliers", "products", "tasks
 
 let idb;
 const cache = Object.fromEntries(COLLECTIONS.map((c) => [c, new Map()]));
-const listeners = new Set();
+const listeners = new Set<(col: string) => void>();
 let meta = { id: "sync", rev: 0, serverId: "", lastSync: "" };
 
 function open() {
@@ -30,7 +30,7 @@ function open() {
   });
 }
 
-function tx(col, mode, fn) {
+function tx(col, mode, fn): Promise<any> {
   return new Promise((resolve, reject) => {
     const t = idb.transaction(col, mode);
     const r = fn(t.objectStore(col));
@@ -38,7 +38,7 @@ function tx(col, mode, fn) {
     t.onerror = () => reject(t.error);
   });
 }
-const getAll = (col) => new Promise((res) => { const r = idb.transaction(col).objectStore(col).getAll(); r.onsuccess = () => res(r.result); });
+const getAll = (col): Promise<any[]> => new Promise((res) => { const r = idb.transaction(col).objectStore(col).getAll(); r.onsuccess = () => res(r.result); });
 
 async function enqueue(col, doc) {
   await tx("outbox", "readwrite", (s) => s.put({ key: `${col}/${doc.id}`, col, doc }));
@@ -99,7 +99,7 @@ export function uid() {
 
 // ---------------- sincronización ----------------
 export const syncState = { status: "idle", pending: 0, lastSync: "", error: "" };
-const syncListeners = new Set();
+const syncListeners = new Set<(s: typeof syncState) => void>();
 export const onSyncChange = (fn) => syncListeners.add(fn);
 const setSync = (patch) => { Object.assign(syncState, patch); syncListeners.forEach((fn) => fn(syncState)); };
 export const pinHeader = () => ({ "x-tradex-pin": localStorage.getItem("v-pin") || "" });
@@ -124,7 +124,7 @@ export async function syncNow() {
     const data = await res.json();
     // lo que se subió sale de la bandeja (salvo que se haya vuelto a editar mientras tanto)
     for (const o of outbox) {
-      const cur = await new Promise((r) => { const q = idb.transaction("outbox").objectStore("outbox").get(o.key); q.onsuccess = () => r(q.result); });
+      const cur: any = await new Promise((r) => { const q = idb.transaction("outbox").objectStore("outbox").get(o.key); q.onsuccess = () => r(q.result); });
       if (cur && cur.doc.updatedAt === o.doc.updatedAt) await tx("outbox", "readwrite", (s) => s.delete(o.key));
     }
     if (meta.serverId && meta.serverId !== data.serverId) {
@@ -140,7 +140,7 @@ export async function syncNow() {
     await tx("meta", "readwrite", (s) => s.put(meta));
     setSync({ status: "ok", pending: (await getAll("outbox")).length, lastSync: meta.lastSync, error: "" });
   } catch (e) {
-    setSync({ status: "offline", pending: (await getAll("outbox")).length, error: e.message });
+    setSync({ status: "offline", pending: (await getAll("outbox")).length, error: (e as Error).message });
   } finally {
     syncing = false;
     if (again) { again = false; scheduleSync(200); }

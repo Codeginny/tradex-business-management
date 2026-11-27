@@ -78,21 +78,23 @@ con la base vacía: `TRADEX_DEMO=0 npm start`.
 
 ## Stack
 
-- **Backend:** Node.js con servidor HTTP propio, sin frameworks (`server.js`, `store.js`), base en un
+- **Backend:** Node.js + TypeScript (strict) con servidor HTTP propio, sin frameworks (`server.ts`, `store.ts`), base en un
   archivo JSON con revisiones para sincronizar.
-- **Frontend:** HTML, CSS y JavaScript con módulos ES, sin frameworks ni build; IndexedDB y Service Worker.
+- **Frontend:** HTML, CSS y TypeScript con módulos ES, sin frameworks ni bundler: `tsc` compila `web/` a
+  `public/js/` (`npm run build`, corre solo antes de `npm start`); IndexedDB y Service Worker.
 - **IA:** SDK de Anthropic (`/api/assistant`, `/api/lookup`, `/api/catalog`) + Web Speech API.
 - **Otros:** pdf.js para leer catálogos, notificaciones del sistema, systemd para el arranque automático.
 
 ```
-server.js            servidor + endpoints de IA y sincronización
-store.js             base central y copias de seguridad
+server.ts            servidor + endpoints de IA y sincronización
+store.ts             base central y copias de seguridad
 demo/                datos ficticios de la demo
 public/index.html    app (PWA)
-public/js/db.js      base local (IndexedDB) y sincronización
-public/js/alerts.js  motor de avisos y calendario
-public/js/assistant.js  asistente por voz
-public/js/views/     una vista por sección
+web/db.ts            base local (IndexedDB) y sincronización
+web/alerts.ts        motor de avisos y calendario
+web/assistant.ts     asistente por voz
+web/views/           una vista por sección
+web/sw.ts            service worker (se compila a public/sw.js)
 ```
 
 ## Marca

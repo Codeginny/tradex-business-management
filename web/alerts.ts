@@ -9,7 +9,7 @@ import { toast } from "./ui.js";
 import { personalAlerts, personalEvents } from "./views/personal.js";
 
 // Proveedor de cada producto del pedido: el elegido en el renglón, el del catálogo o (pedidos viejos) el principal
-export const itemSupplierId = (i, o = {}) => i.supplierId || (i.productId && db.get("products", i.productId)?.supplierId) || o.supplierId || "";
+export const itemSupplierId = (i, o: Rec = {}) => i.supplierId || (i.productId && db.get("products", i.productId)?.supplierId) || o.supplierId || "";
 export const orderSupplierIds = (o) => [...new Set((o.items || []).map((i) => itemSupplierId(i, o)).filter(Boolean))];
 
 export function leadDays(o) {
@@ -74,7 +74,7 @@ export function computeAlerts() {
 }
 
 // Guarda las alertas nuevas en el historial y las muestra (toast + notificación del sistema)
-export async function syncNotifications({ silent = false } = {}) {
+export async function syncNotifications({ silent = false }: Rec = {}) {
   const alerts = computeAlerts();
   const fresh = [];
   for (const a of alerts) {

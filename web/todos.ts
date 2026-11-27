@@ -197,7 +197,7 @@ export function renderBell() {
   if (!b) return;
   const n = pendingCount();
   b.innerHTML = `${icon("bell")}${n ? `<span class="count">${n}</span>` : ""}`;
-  b.title = n ? `${n} cosa${n === 1 ? "" : "s"} para hacer hoy` : "Nada pendiente hoy";
+  (b as HTMLElement).title = n ? `${n} cosa${n === 1 ? "" : "s"} para hacer hoy` : "Nada pendiente hoy";
   draw();
 }
 export function askOncePerDay() {

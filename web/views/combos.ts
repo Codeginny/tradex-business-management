@@ -81,7 +81,7 @@ export function combosHTML() {
 
 // Un renglón del combo (sin name, así readForm no lo mezcla con el resto del formulario)
 const prodOpts = (sel) => options(db.all("products").sort((a, b) => a.name.localeCompare(b.name)).map((p) => [p.id, p.name]), sel, "Elegí un producto…");
-const lineRow = (l = {}) => {
+const lineRow = (l: Rec = {}) => {
   const p = db.get("products", l.productId);
   return `<div class="grid combo-line" style="grid-template-columns: 2fr 70px 1.4fr 1fr 36px; gap:4px 8px; align-items:end">
     <label class="field">Producto<select data-lprod>${prodOpts(l.productId)}</select></label>
@@ -199,7 +199,7 @@ export function openComboBuilder(rows, { onBuild, onPick }) {
         if (c) { $("#cb-info", el).innerHTML = `${comboLines(c).map((l) => `x${l.qty} ${esc(l.product)}`).join(" · ")} · ${discountText(c)}`; return; }
         if (!$("#cb-sum", el)) return;
         const d = draft(), r = comboPrice(d);
-        const qtys = [...new Set(r.lines.map((l) => l.qty))];
+        const qtys: number[] = [...new Set<number>(r.lines.map((l) => l.qty))];
         $("#cb-sum", el).innerHTML = r.lines.length < 2 ? `<span class="small muted">Tildá al menos dos productos.</span>`
           : !d.discount ? `<div class="price-line"><span>Costo suelto (catálogo)</span><b>${money(r.goods)}</b></div><span class="small muted">Escribí cuánto te cobra el proveedor por el combo (1 de cada uno).</span>`
           : `<div class="price-line"><span>Costo del combo${qtys.length === 1 ? ` (x${qtys[0]} × ${money(d.discount)})` : ""}</span><b>${money(r.goods)}</b></div>
@@ -209,7 +209,7 @@ export function openComboBuilder(rows, { onBuild, onPick }) {
           <div class="small" style="margin-top:4px;color:var(--ok)">Te quedan ${money(r.profit)} de ganancia${qtys.length === 1 && qtys[0] ? ` · ${money(r.final / qtys[0])} cada combo` : ""}.</div>`;
       };
       // costo de 1 combo ↔ costo de todos: completás uno y el otro se calcula (cantidad = la de los productos tildados)
-      const comboCount = () => { const q = [...new Set(picked().map((r) => Number(r.qty) || 0))]; return q.length === 1 && q[0] > 0 ? q[0] : 0; };
+      const comboCount = () => { const q = [...new Set<number>(picked().map((r) => Number(r.qty) || 0))]; return q.length === 1 && q[0] > 0 ? q[0] : 0; };
       const syncTotal = () => {
         const n = comboCount(), t = $("#cb-total", el); if (!t) return;
         t.disabled = !n;

@@ -31,7 +31,7 @@ export function unitCostFor(p, qty) {
 const tiersText = (p) => tiersOf(p).map((t) => `x${t.min}+ ${money(t.price)}`);
 
 // Precio de venta sugerido para una cantidad: (costo x cant + envío + costos ocultos) + ganancia 60% (o 50% si supera $100.000)
-export function suggestedPrice(p, qty) {
+export function suggestedPrice(p, qty?) {
   qty = Math.max(1, Number(qty) || Number(p.minQty) || 1);
   const goods = unitCostFor(p, qty) * qty;
   const ship = productShipping(p);
@@ -40,7 +40,7 @@ export function suggestedPrice(p, qty) {
   return { qty, goods, ship, hidden, ...r, unit: r.price / qty };
 }
 
-export function findProducts({ search = "", sort = "cheapest", limit = 5 } = {}) {
+export function findProducts({ search = "", sort = "cheapest", limit = 5 }: Rec = {}) {
   const words = search.toLowerCase().replace(/s\b/g, "").split(/\s+/).filter((w) => w.length > 2);
   let list = db.all("products").filter((p) => {
     const hay = `${p.name} ${p.category}`.toLowerCase();
@@ -227,11 +227,11 @@ export function duplicateProduct(p) {
 }
 
 // Un renglón de escala: "desde X unidades → $ c/u" (sin name, así no lo pisa readForm)
-const tierRow = (t = {}) => `<div class="grid g2 tier-row">
+const tierRow = (t: Rec = {}) => `<div class="grid g2 tier-row">
   <label class="field">Desde (unidades)<input data-tmin type="number" min="1" value="${t.min ?? ""}" placeholder="20"></label>
   <label class="field">Precio c/u<input data-tprice data-money="1" value="${t.price ?? ""}" placeholder="4331"></label></div>`;
 
-export function openProductForm(p = null, { duplicate = false, onSave } = {}) {
+export function openProductForm(p = null, { duplicate = false, onSave }: Rec = {}) {
   const isNew = !p?.id;
   p = p ? { ...p } : { category: "", size: "small", priceDate: today() };
   const sups = db.all("suppliers");

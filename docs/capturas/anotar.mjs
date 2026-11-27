@@ -319,9 +319,9 @@ for (const cap of CAPTURAS) {
 // Tarjetas de código: [nombre, archivo, texto con el que empieza, cuántas líneas, título].
 const raiz = new URL('../../', import.meta.url).pathname;
 const CODIGO = [
-  ['f04-avisos-codigo', 'public/js/alerts.js', '// Fechas recordatorio', 13, 'public/js/alerts.js · cuándo pedir al proveedor'],
-  ['f05-precio-codigo', 'public/js/utils.js', '// costo (precio x cantidad)', 8, 'public/js/utils.js · precio sugerido con margen escalonado'],
-  ['f06-sync-codigo', 'public/js/db.js', 'async function applyRemote', 15, 'public/js/db.js · sincronizar sin conexión: gana la edición más reciente'],
+  ['f04-avisos-codigo', 'web/alerts.ts', '// Fechas recordatorio', 13, 'web/alerts.ts · cuándo pedir al proveedor'],
+  ['f05-precio-codigo', 'web/utils.ts', '// costo (precio x cantidad)', 8, 'web/utils.ts · precio sugerido con margen escalonado'],
+  ['f06-sync-codigo', 'web/db.ts', 'async function applyRemote', 15, 'web/db.ts · sincronizar sin conexión: gana la edición más reciente'],
 ];
 for (const [nombre, archivo, inicio, cuantas, titulo] of CODIGO) {
   if (SOLO && SOLO !== nombre) continue;

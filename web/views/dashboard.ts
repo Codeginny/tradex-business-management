@@ -16,7 +16,7 @@ import { norm } from "../suggest.js";
 import { sortedTodos, todoListHTML, bindTodoList, problemNote, solveProblem } from "../todos.js";
 import { monthStats, vbars, hbars, donut, card, empty, bindTooltip, mName, shiftMonth, DOW as DOW_SHORT } from "./stats.js";
 
-export function alertList(alerts, el) {
+export function alertList(alerts, el?) {
   return alerts.length ? alerts.map((a) => `
     <div class="alert-item ${a.urgent ? "urgent" : ""}">
       <div class="ic">${a.icon}</div>
@@ -92,7 +92,7 @@ export function bindAlerts(el) {
 // "hace 5 min", "hace 3 h", "ayer 21:40", "4/11 18:05"
 function whenAgo(iso) {
   if (!iso) return "";
-  const d = new Date(iso), mins = Math.round((Date.now() - d) / 60000);
+  const d = new Date(iso), mins = Math.round((Date.now() - +d) / 60000);
   const hm = d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
   if (mins < 1) return "recién";
   if (mins < 60) return `hace ${mins} min`;
@@ -224,7 +224,7 @@ function weekPlanner(t) {
     <div class="planner">${days.map((dt, i) => {
       const dl = orders.filter((o) => o.deadline === dt && o.status !== "entregado");
       const ev = orders.filter((o) => o.eventDate === dt && o.status !== "entregado"); // si ya lo entregaste, no se muestra la fiesta
-      const tk = tasks.filter((k) => k.date === dt).sort((a, b) => !!b.done - !!a.done); // las tildadas van arriba
+      const tk = tasks.filter((k) => k.date === dt).sort((a, b) => +!!b.done - +!!a.done); // las tildadas van arriba
       return `<div class="pday ${dt === t ? "today" : ""} ${dt < t ? "past" : ""}">
         <div class="pday-head"><b>${DOW_SHORT[i]}</b><span>${parseISO(dt).getDate()}</span></div>
         ${dl.map((o) => `<button class="pdel ${dt === t ? "hl-today" : dt === addDays(t, 1) ? "hl-tomorrow" : dt < t ? "hl-late" : ""}" data-o="${o.id}">
@@ -279,7 +279,7 @@ function statCards({ active, toOrder, t, monthOrders }) {
 }
 
 // Al tocar "Sin pedir / Esperando proveedor / Para entregar": la lista de pedidos para cambiarles el estado
-const GROUPS = [["📝 Sin pedir", (o) => BEFORE_SUPPLIER.includes(o.status)], ["⏳ Esperando proveedor", (o) => o.status === "esperando"], ["🚚 Para entregar", (o) => o.status === "entregar"]];
+const GROUPS: [string, (o: Rec) => boolean][] = [["📝 Sin pedir", (o) => BEFORE_SUPPLIER.includes(o.status)], ["⏳ Esperando proveedor", (o) => o.status === "esperando"], ["🚚 Para entregar", (o) => o.status === "entregar"]];
 function groupList(i) {
   const [title, fits] = GROUPS[i];
   const draw = (el) => {
@@ -366,7 +366,7 @@ async function syncHandoffs(t) {
   // tareas repetidas (mismo texto, mismo día y mismo pedido): queda una sola
   // (también "Hoy viene a retirar" y "Hoy entrego" del mismo pedido, o la misma nota con y sin @clienta)
   const seen = new Set();
-  const tasksSorted = db.all("tasks").filter((x) => !x.postit).sort((a, b) => !!b.done - !!a.done);
+  const tasksSorted = db.all("tasks").filter((x) => !x.postit).sort((a, b) => +!!b.done - +!!a.done);
   for (const k of tasksSorted) {
     const key = `${k.date}|${taskKey(k)}`;
     if (seen.has(key)) { await db.remove("tasks", k.id); added++; } else seen.add(key); // queda la tildada, si hay

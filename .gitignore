@@ -8,3 +8,7 @@ data/
 # Configuración local de herramientas
 .claude/
 .vscode/
+
+# JavaScript generado por tsc desde web/ (npm run build)
+public/js/
+public/sw.js

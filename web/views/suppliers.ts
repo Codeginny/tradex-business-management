@@ -141,7 +141,7 @@ function fillMissing(form, info) {
 // Busca teléfono, dirección y redes públicas del proveedor (IA + búsqueda web)
 export async function lookupSupplier({ name, product = "", province = "" }) {
   if (!aiAvailable()) return null;
-  try { return await api("/api/lookup", { name, product, province }); } catch (e) { toast("No se pudo buscar", e.message); return null; }
+  try { return await api("/api/lookup", { name, product, province }); } catch (e) { toast("No se pudo buscar", (e as Error).message); return null; }
 }
 
 // Completa en segundo plano los datos que falten de un proveedor ya guardado
@@ -149,7 +149,7 @@ export async function autoCompleteSupplier(s) {
   if (s.phone && s.social) return null;
   const info = await lookupSupplier({ name: s.name, province: s.province });
   if (!info) return null;
-  const patch = {};
+  const patch: Rec = {};
   if (!s.phone && (info.phone || info.whatsapp)) patch.phone = info.phone || info.whatsapp;
   if (!s.social && (info.instagram || info.facebook)) patch.social = info.instagram || info.facebook;
   if (!s.website && info.website) patch.website = info.website;
@@ -186,7 +186,7 @@ export function importCatalog(supplierId = "") {
         try {
           rows = await extractCatalog(file, supSel.selectedOptions[0]?.text || $("#ci-new", el).value);
         } catch (err) {
-          $("#ci-out", el).innerHTML = `<p style="color:var(--u-red)">No pude leer el PDF: ${esc(err.message)}</p>`; return;
+          $("#ci-out", el).innerHTML = `<p style="color:var(--u-red)">No pude leer el PDF: ${esc((err as Error).message)}</p>`; return;
         }
         $("#ci-out", el).innerHTML = rows.length ? `<p><b>${rows.length}</b> artículos encontrados. Podés corregir antes de importar.</p>
           <div class="table-wrap" style="max-height:340px;overflow:auto"><table><thead><tr><th></th><th>Artículo</th><th>Categoría</th><th>Precio</th><th>Mínimo</th></tr></thead><tbody>
@@ -232,10 +232,10 @@ async function extractCatalog(file, supplierName) {
     try {
       const out = await api("/api/catalog", { pdfBase64: b64, supplierName });
       if (out?.products?.length) return out.products.filter((p) => p.name && p.price > 0);
-    } catch (e) { toast("La IA no pudo leerlo, pruebo en modo local", e.message); }
+    } catch (e) { toast("La IA no pudo leerlo, pruebo en modo local", (e as Error).message); }
   }
   // Modo local con pdf.js: cada renglón con un precio se vuelve un artículo
-  const pdfjs = await import("/vendor/pdf.min.mjs");
+  const pdfjs = await import(/* pdf.js se sirve tal cual desde public/vendor */ "/vendor/pdf.min.mjs" as string);
   pdfjs.GlobalWorkerOptions.workerSrc = "/vendor/pdf.worker.min.mjs";
   const pdf = await pdfjs.getDocument({ data: buf }).promise;
   const rows = [];

@@ -21,7 +21,7 @@ export const iso = (d) => {
 export const parseISO = (s) => { if (!s) return null; const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
 export const today = () => iso(new Date());
 export const addDays = (s, n) => { const d = parseISO(s); d.setDate(d.getDate() + n); return iso(d); };
-export const diffDays = (a, b) => Math.round((parseISO(a) - parseISO(b)) / 86400000);
+export const diffDays = (a, b) => Math.round((+parseISO(a) - +parseISO(b)) / 86400000);
 export const DOW = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 // DNI o CUIL/CUIT: con 11 números lleva guiones (27-41808224-6); si no, queda como se escribió
 // CUIT/CUIL = 11 números; los que tienen CUIT van con factura
@@ -32,7 +32,7 @@ export const fmtDni = (v) => { const d = String(v || "").replace(/\D/g, ""); ret
 // "Miércoles 18 de nov." para saber qué día cae
 export const dayLabel = (dt) => { const d = parseISO(dt), w = DOW[d.getDay()]; return `${w[0].toUpperCase()}${w.slice(1)} ${d.getDate()} de ${MONTHS[d.getMonth()].slice(0, 3)}.`; };
 export const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-export const fmtDate = (s, opts = {}) => {
+export const fmtDate = (s, opts: Rec = {}) => {
   if (!s) return "—";
   const d = parseISO(s);
   const base = `${d.getDate()}/${d.getMonth() + 1}`;
@@ -66,7 +66,7 @@ function movable(y, m, d) {
 // Puentes turísticos (los fija el Gobierno cada año; se pueden agregar más en Ajustes)
 const BRIDGES = { 2026: ["2026-03-23", "2026-07-10", "2026-12-07"] };
 
-const holidayCache = {};
+const holidayCache: Rec = {};
 export function holidaysOf(y) {
   if (holidayCache[y]) return holidayCache[y];
   const e = easter(y);
@@ -127,7 +127,7 @@ export const statusKey = (k) => (STATUSES.some((s) => s.key === k) ? k : "pedir"
 // solo Pedir (rojo) y Recibir (morado) tienen fondo; Entregar y Entregado van sin color
 const ST_BG = { pedir: "background-color:#f97316;color:#fff;border-color:#f97316", esperando: "background-color:#5f6470;color:#fff;border-color:#5f6470" };
 export const statusStyle = (k) => ST_BG[statusKey(k)] || "background-color:transparent;color:inherit";
-export const statusPill = (k, label) => `<span class="st-pill" style="${statusStyle(k)}">${esc(label || statusOf(k).label)}</span>`;
+export const statusPill = (k, label?) => `<span class="st-pill" style="${statusStyle(k)}">${esc(label || statusOf(k).label)}</span>`;
 export const BEFORE_SUPPLIER = ["senado", "pagado", "disenar", "pagar", "pedir"];
 export const CHANNELS = ["Instagram", "WhatsApp", "Recomendación", "Facebook", "Local", "Otro"];
 export const SHIPPING = ["Correo", "Retiro en local", "Moto/Uber"];
@@ -180,14 +180,14 @@ export function priceFromCost(base) {
   if (profit > s.markupThreshold) { pct = s.markupHigh; profit = base * pct / 100; }
   return { base, pct, profit, price: base + profit };
 }
-export function hiddenCostsPerUnit(keys) {
+export function hiddenCostsPerUnit(keys?) {
   return settings().hidden.filter((h) => (keys ? keys.includes(h.key) : h.on)).reduce((a, h) => a + Number(h.cost || 0), 0);
 }
 
 // ---------- cuotas (Naranja X) ----------
 // Lo que te descuentan = comisión × (1 + IVA) + financiación de las cuotas (+ IIBB si te retienen).
 // mode "net": "quiero que me queden $X" -> cuánto cobrarle al cliente.  mode "gross": "cobro $X" -> cuánto me queda.
-export function cuotasOptions(amount, { medio = 0, mode = "net" } = {}) {
+export function cuotasOptions(amount, { medio = 0, mode = "net" }: Rec = {}) {
   const s = settings();
   const m = s.payMedia[medio] || s.payMedia[0];
   const iva = 1 + Number(s.iva) / 100;
@@ -213,7 +213,7 @@ export function cuotasOptions(amount, { medio = 0, mode = "net" } = {}) {
     return { ...r, medio: m.name, cost, price, net, fees: price - net, parts, cuota: r.n ? price / r.n : null };
   });
 }
-export function cuotasMessage(amount, opts = {}) {
+export function cuotasMessage(amount, opts: Rec = {}) {
   const rows = cuotasOptions(amount, opts).filter((r) => r.key !== "debito");
   const lines = rows.map((r) => r.key === "cuenta" ? `• Transferencia / dinero en cuenta: ${money(r.price)}`
     : r.planZ ? `• Plan Z: ${money(r.price)}` : r.n === 1 ? `• Tarjeta de crédito en 1 pago: ${money(r.price)}`
@@ -257,7 +257,7 @@ export function resizeImage(file, max = 480) {
         resolve(c.toDataURL("image/jpeg", 0.82));
       };
       img.onerror = reject;
-      img.src = r.result;
+      img.src = r.result as string;
     };
     r.onerror = reject;
     r.readAsDataURL(file);

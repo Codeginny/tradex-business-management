@@ -13,7 +13,7 @@ export const saveLoyaltyConf = (patch) => saveSettings({ loyalty: { ...loyaltyCo
 export const prizePct = (label) => Number(String(label || "").match(/(\d+)\s*%/)?.[1]) || 0;
 
 // Estado de la tarjeta de un cliente. exceptOrder: el pedido que se está editando (su premio no cuenta como usado)
-export function loyaltyOf(clientId, { exceptOrder } = {}) {
+export function loyaltyOf(clientId, { exceptOrder }: Rec = {}) {
   const conf = loyaltyConf();
   const B = Math.max(1, Number(conf.boxes) || 10);
   const cl = clientId ? db.get("clients", clientId) : null;

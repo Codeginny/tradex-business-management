@@ -60,7 +60,7 @@ export function render(el, params) {
   };
 }
 
-export function openTaskForm(k = {}) {
+export function openTaskForm(k: Rec = {}) {
   const isNew = !k.id;
   modal({
     title: isNew ? "Nueva tarea / recordatorio" : "Editar tarea",

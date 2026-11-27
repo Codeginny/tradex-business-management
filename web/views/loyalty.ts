@@ -54,7 +54,7 @@ export function render(el) {
   const read = () => {
     const f = readForm(form);
     const boxes = Math.min(20, Math.max(2, Number(f.boxes) || 10));
-    const prizes = {};
+    const prizes: Rec = {};
     for (let b = 1; b <= boxes; b++) if (f[`p${b}`]) prizes[b] = f[`p${b}`];
     return { boxes, prizes, minPurchase: Number(f.minPurchase) || 0 };
   };

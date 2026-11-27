@@ -80,7 +80,7 @@ export function render(el) {
   const rowsOf = (sel) => $$(sel, el).map((r) => Object.fromEntries($$("[data-k]", r).map((i) => [i.dataset.k, i.type === "checkbox" ? i.checked : i.type === "number" ? Number(i.value) : i.value])));
   const collect = () => {
     const f = readForm($("#st", el));
-    const keep = {};
+    const keep: Rec = {};
     for (const k of ["businessName", "businessPhone", "businessAddress", "pickupInfo"]) keep[k] = f[k];
     for (const k of ["markup", "markupThreshold", "markupHigh", "shipSmall", "shipBig", "iva", "iibb"]) keep[k] = Number(f[k]) || 0;
     keep.ivaOnFinancing = !!f.ivaOnFinancing;
@@ -121,7 +121,7 @@ export function render(el) {
 }
 
 async function drawSync(card) {
-  let status = {}, backups = null;
+  let status: Rec = {}, backups = null;
   try { status = await (await fetch("/api/status")).json(); } catch {}
   try { const r = await fetch("/api/backups", { headers: pinHeader() }); if (r.ok) backups = await r.json(); } catch {}
   const kb = (n) => n > 1e6 ? `${(n / 1e6).toFixed(1)} MB` : `${Math.round(n / 1e3)} KB`;
@@ -159,7 +159,7 @@ async function loadDemo() {
   ];
   const prods = [];
   for (const [name, category, supplierId, price, minQty] of P) prods.push(await db.put("products", { name, category, supplierId, price, minQty, size: category === "Botellas" ? "big" : "small", priceDate: addDays(t, -Math.floor(Math.random() * 60)), priceHistory: [{ date: addDays(t, -90), price: Math.round(price * 0.85) }, { date: t, price }] }));
-  const O = [
+  const O: any[][] = [
     ["Sofía Gómez", "383 4123456", "Instagram", nextDow(6, 2), -1, "senado", [[prods[0], 40, 6500]], 100000, "Quiere la caja en dorado, con cinta rosa y sin tapa"],
     ["Martín Ruiz", "383 4987654", "WhatsApp", nextDow(5, 3), -2, "pagado", [[prods[8], 250, 3800]], 950000, "Egresados 5to B, logo en blanco"],
     ["Carla Pérez", "381 5551212", "Recomendación", addDays(t, 3), -1, "esperando", [[prods[5], 30, 6000], [prods[7], 30, 1800]], 120000, "Comunión de Juli, etiquetas lila"],

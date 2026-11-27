@@ -29,10 +29,10 @@ export function placeFromPhone(phone) {
   return hit ? { province: hit[1], city: hit[2] } : null;
 }
 
-export function placeFields(prefix, c = {}) {
-  const old = !c.province && !c.city && c.address ? splitAddress(c.address) : {};
-  return `<label class="field">Provincia<input name="${prefix}province" value="${esc(c.province || old.province || "")}" placeholder="Ej: Catamarca" autocomplete="off"></label>
-    <label class="field">Localidad<input name="${prefix}city" value="${esc(c.city || old.city || "")}" placeholder="Ej: Belén" autocomplete="off"></label>`;
+export function placeFields(prefix, c: Rec = {}) {
+  const old = !c.province && !c.city && c.address ? splitAddress(c.address) : null;
+  return `<label class="field">Provincia<input name="${prefix}province" value="${esc(c.province || old?.province || "")}" placeholder="Ej: Catamarca" autocomplete="off"></label>
+    <label class="field">Localidad<input name="${prefix}city" value="${esc(c.city || old?.city || "")}" placeholder="Ej: Belén" autocomplete="off"></label>`;
 }
 
 export async function bindPlaces(form, prefix) {

@@ -128,7 +128,7 @@ function cuotas(el, params) {
 
 // ---------- rentabilidad por producto / categoría ----------
 function rentab(el) {
-  const by = {};
+  const by: Rec = {};
   for (const o of db.all("orders")) for (const i of o.items || []) {
     const k = i.category || "Sin categoría";
     by[k] ||= { cat: k, qty: 0, sales: 0, cost: 0, products: {} };
@@ -141,7 +141,7 @@ function rentab(el) {
   const max = Math.max(1, ...rows.map((r) => r.profit));
   const best = rows[0];
   const bestMargin = [...rows].sort((a, b) => b.margin - a.margin)[0];
-  const topProducts = rows.flatMap((r) => Object.entries(r.products).map(([n, p]) => ({ n, p }))).sort((a, b) => b.p - a.p).slice(0, 8);
+  const topProducts = rows.flatMap((r) => Object.entries(r.products).map(([n, p]) => ({ n, p }))).sort((a, b) => (b.p as number) - (a.p as number)).slice(0, 8);
   el.innerHTML = rows.length ? `<div class="stack">
     <div class="grid g2">
       <div class="hero"><p style="margin:0">Lo que más ganancia te deja</p><h2>${esc(best.cat)}: ${money(best.profit)}</h2><p>${best.qty} unidades vendidas · margen ${Math.round(best.margin * 100)}%</p></div>
@@ -217,7 +217,7 @@ function exporter(el) {
     const f = e.target.files[0];
     if (!f) return;
     if (!(await confirmBox("Restaurar reemplaza TODOS los datos actuales por los del respaldo.", "Restaurar"))) return;
-    try { await db.restore(JSON.parse(await f.text())); toast("✅ Respaldo restaurado"); } catch (err) { toast("Archivo inválido", err.message, { urgent: true }); }
+    try { await db.restore(JSON.parse(await f.text())); toast("✅ Respaldo restaurado"); } catch (err) { toast("Archivo inválido", (err as Error).message, { urgent: true }); }
   };
   $("#x-pdf", el).onclick = () => {
     const mk = monthKey(today());

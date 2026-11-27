@@ -92,7 +92,7 @@ export function hbars(entries, fmt) {
 }
 
 // Dona: hasta 5 porciones + "Otros"
-export function donut(map, fmt, { center = shortMoney, centerLabel = "total", clickable = false } = {}) {
+export function donut(map, fmt, { center = shortMoney, centerLabel = "total", clickable = false }: Rec = {}) {
   const key = (k) => (clickable && k !== "Otros" ? ` data-dkey="${esc(k)}" style="cursor:pointer"` : "");
   let entries = [...map].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
   if (entries.length > 5) entries = [...entries.slice(0, 4), ["Otros", entries.slice(4).reduce((a, [, v]) => a + v, 0)]];

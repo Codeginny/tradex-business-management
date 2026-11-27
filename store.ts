@@ -7,17 +7,25 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 
-export const COLLECTIONS = ["orders", "clients", "suppliers", "products", "tasks", "notifications", "settings", "worklog", "quotes", "personal", "combos"];
+// Cada colección guarda documentos libres que define la app; el servidor sólo usa estos campos
+export interface Doc { id: string; deleted?: boolean; updatedAt?: string; createdAt?: string; [campo: string]: any }
+export interface Entry { col: Collection; doc: Doc; rev: number }
+interface Db { serverId: string; rev: number; docs: Record<string, Entry> }
+export interface Change { col: Collection; doc: Doc }
+export interface Backup { name: string; date: string; size: number }
+
+export const COLLECTIONS = ["orders", "clients", "suppliers", "products", "tasks", "notifications", "settings", "worklog", "quotes", "personal", "combos"] as const;
+export type Collection = (typeof COLLECTIONS)[number];
 const KEEP_DAILY_DAYS = 60; // además se guarda para siempre la primera copia de cada mes
 
-export function createStore({ dataDir, backupDir }) {
+export function createStore({ dataDir, backupDir }: { dataDir: string; backupDir: string }) {
   const file = path.join(dataDir, "tradex.json");
   fs.mkdirSync(dataDir, { recursive: true });
   fs.mkdirSync(backupDir, { recursive: true });
   // Fotos de productos: un archivo por foto en data/fotos (nombre = huella del contenido, no se repiten)
   const photoDir = path.join(dataDir, "fotos");
   fs.mkdirSync(photoDir, { recursive: true });
-  function savePhoto(dataUrl) {
+  function savePhoto(dataUrl: unknown): string | null {
     const m = String(dataUrl || "").match(/^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/);
     if (!m) return null;
     const buf = Buffer.from(m[2], "base64");
@@ -28,14 +36,14 @@ export function createStore({ dataDir, backupDir }) {
     return `/fotos/${name}`;
   }
   // Si un producto llega con la foto adentro (versión vieja de la app o celular sin conexión), se pasa a archivo
-  const withPhotoFile = (col, doc) => {
+  const withPhotoFile = (col: Collection, doc: Doc): Doc => {
     if (col !== "products" || doc.deleted || !String(doc.image || "").startsWith("data:")) return doc;
     const url = savePhoto(doc.image);
     return url ? { ...doc, image: url } : doc;
   };
 
   // docs: { "orders/abc": { col, doc, rev } } ; rev crece con cada cambio recibido
-  let db = { serverId: crypto.randomUUID(), rev: 0, docs: {} };
+  let db: Db = { serverId: crypto.randomUUID(), rev: 0, docs: {} };
   // Primera vez: arranca con los datos ficticios de demo/tradex-demo.json (si están)
   const demoFile = new URL("./demo/tradex-demo.json", import.meta.url);
   if (fs.existsSync(file)) db = JSON.parse(fs.readFileSync(file, "utf8"));
@@ -45,18 +53,18 @@ export function createStore({ dataDir, backupDir }) {
   // ---------- clientes ----------
   // Cada pedido apunta a una ficha de cliente (clientId). Si llega un pedido sin ficha
   // (de una versión vieja de la app), la compu la busca por teléfono, DNI o nombre, o la crea.
-  const norm = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\s+/g, " ").trim();
-  const phoneKey = (p) => String(p || "").replace(/\D/g, "").slice(-8);
+  const norm = (t: unknown) => String(t || "").toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\s+/g, " ").trim();
+  const phoneKey = (p: unknown) => String(p || "").replace(/\D/g, "").slice(-8);
   const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  function findClient(c) {
+  function findClient(c: Doc): Doc | undefined {
     const list = Object.values(db.docs).filter((e) => e.col === "clients" && !e.doc.deleted).map((e) => e.doc);
     const pk = phoneKey(c.phone);
     return (pk.length >= 6 && list.find((x) => phoneKey(x.phone) === pk))
       || (c.dni && list.find((x) => String(x.dni || "").replace(/\D/g, "") === String(c.dni).replace(/\D/g, "")))
-      || list.find((x) => norm(x.name) === norm(c.name));
+      || list.find((x) => norm(x.name) === norm(c.name)) || undefined;
   }
-  function putClient(doc) { db.docs[`clients/${doc.id}`] = { col: "clients", doc, rev: ++db.rev }; }
-  function linkOrder(doc) {
+  function putClient(doc: Doc) { db.docs[`clients/${doc.id}`] = { col: "clients", doc, rev: ++db.rev }; }
+  function linkOrder(doc: Doc): Doc {
     if (doc.deleted || doc.clientId || !doc.client?.name) return doc;
     const now = new Date().toISOString();
     let cl = findClient(doc.client);
@@ -64,7 +72,7 @@ export function createStore({ dataDir, backupDir }) {
       cl = { id: newId(), name: doc.client.name.trim(), phone: doc.client.phone || "", address: doc.client.address || "", dni: doc.client.dni || "", createdAt: doc.createdAt || now, updatedAt: now };
       putClient(cl);
     } else {
-      const patch = {};
+      const patch: Record<string, unknown> = {};
       for (const k of ["phone", "address", "dni"]) if (!cl[k] && doc.client[k]) patch[k] = doc.client[k];
       if (Object.keys(patch).length) putClient({ ...cl, ...patch, updatedAt: now });
     }
@@ -82,8 +90,8 @@ export function createStore({ dataDir, backupDir }) {
     for (const e of Object.values(db.docs)) {
       if (e.doc.deleted) continue;
       if (e.col === "products" && e.doc.category === "Ecovasos") { e.doc = { ...e.doc, category: "Vasos", updatedAt: new Date().toISOString() }; e.rev = ++db.rev; r++; }
-      if (e.col === "orders" && (e.doc.items || []).some((i) => i.category === "Ecovasos")) {
-        e.doc = { ...e.doc, items: e.doc.items.map((i) => (i.category === "Ecovasos" ? { ...i, category: "Vasos" } : i)), updatedAt: new Date().toISOString() }; e.rev = ++db.rev; r++;
+      if (e.col === "orders" && (e.doc.items || []).some((i: { category?: string }) => i.category === "Ecovasos")) {
+        e.doc = { ...e.doc, items: e.doc.items.map((i: { category?: string }) => (i.category === "Ecovasos" ? { ...i, category: "Vasos" } : i)), updatedAt: new Date().toISOString() }; e.rev = ++db.rev; r++;
       }
     }
     // fotos guardadas adentro de los productos -> archivos en data/fotos
@@ -105,7 +113,7 @@ export function createStore({ dataDir, backupDir }) {
 
   // Recibe cambios de un dispositivo y devuelve todo lo nuevo desde "since".
   // Si dos dispositivos editan lo mismo, gana la edición más reciente.
-  function sync({ since = 0, changes = [] }) {
+  function sync({ since = 0, changes = [] }: { since?: number; changes?: Change[] }) {
     let touched = 0;
     for (const { col, doc: incoming } of changes) {
       if (!COLLECTIONS.includes(col) || !incoming?.id) continue;
@@ -123,15 +131,15 @@ export function createStore({ dataDir, backupDir }) {
   }
 
   function dump() {
-    const out = { app: "TRADEX", exportedAt: new Date().toISOString() };
+    const out: Record<string, unknown> & Partial<Record<Collection, Doc[]>> = { app: "TRADEX", exportedAt: new Date().toISOString() };
     for (const c of COLLECTIONS) out[c] = [];
-    for (const { col, doc } of Object.values(db.docs)) if (!doc.deleted) out[col].push(doc);
+    for (const { col, doc } of Object.values(db.docs)) if (!doc.deleted) out[col]!.push(doc);
     return out;
   }
 
   const localDay = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-  function backup({ force = false } = {}) {
+  function backup({ force = false } = {}): string | null {
     const name = `tradex-${localDay()}.json`;
     const target = path.join(backupDir, name);
     const hasData = Object.values(db.docs).some((e) => !e.doc.deleted && e.col !== "notifications");
@@ -150,7 +158,7 @@ export function createStore({ dataDir, backupDir }) {
     for (const f of fs.readdirSync(photoDir)) if (!fs.existsSync(path.join(dest, f))) fs.copyFileSync(path.join(photoDir, f), path.join(dest, f));
   }
 
-  function listBackups() {
+  function listBackups(): Backup[] {
     return fs.readdirSync(backupDir)
       .filter((f) => /^tradex-\d{4}-\d{2}-\d{2}\.json$/.test(f))
       .sort().reverse()
@@ -160,8 +168,8 @@ export function createStore({ dataDir, backupDir }) {
   // Borra copias diarias viejas, pero conserva siempre la primera de cada mes
   function prune() {
     const limit = localDay(new Date(Date.now() - KEEP_DAILY_DAYS * 86400000));
-    const firstOfMonth = new Set();
-    const seen = new Set();
+    const firstOfMonth = new Set<string>();
+    const seen = new Set<string>();
     for (const b of [...listBackups()].reverse()) {
       const m = b.date.slice(0, 7);
       if (!seen.has(m)) { seen.add(m); firstOfMonth.add(b.name); }
@@ -169,7 +177,7 @@ export function createStore({ dataDir, backupDir }) {
     for (const b of listBackups()) if (b.date < limit && !firstOfMonth.has(b.name)) fs.unlinkSync(path.join(backupDir, b.name));
   }
 
-  const backupPath = (name) => (/^tradex-\d{4}-\d{2}-\d{2}\.json$/.test(name) ? path.join(backupDir, name) : null);
+  const backupPath = (name: string) => (/^tradex-\d{4}-\d{2}-\d{2}\.json$/.test(name) ? path.join(backupDir, name) : null);
   const stats = () => ({ docs: Object.values(db.docs).filter((e) => !e.doc.deleted).length, rev: db.rev });
 
   return { sync, backup, listBackups, backupPath, stats, file, backupDir, savePhoto, photoDir };

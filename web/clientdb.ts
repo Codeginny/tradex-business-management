@@ -10,7 +10,7 @@ const FIELDS = ["name", "phone", "address", "province", "city", "dni"];
 
 export const snapshot = (c) => Object.fromEntries(FIELDS.map((k) => [k, c?.[k] || ""]));
 
-export function findClient(c = {}) {
+export function findClient(c: Rec = {}) {
   const list = db.all("clients");
   const pk = phoneKey(c.phone);
   return (pk.length >= 6 && list.find((x) => phoneKey(x.phone) === pk))
@@ -39,7 +39,7 @@ export async function ensureClient(data, clientId) {
   if (!cl) return db.put("clients", { ...snapshot(data), notes: "" });
   // Si el pedido ya estaba vinculado a la ficha, lo que se editó en el pedido corrige la ficha.
   // Si la ficha se encontró por teléfono/DNI/nombre, solo se completan los datos que le faltan.
-  const patch = {};
+  const patch: Rec = {};
   for (const k of FIELDS) if (data[k] && data[k] !== cl[k] && (chosen || !cl[k])) patch[k] = data[k];
   if (Object.keys(patch).length) {
     cl = await db.put("clients", { ...cl, ...patch });
@@ -58,7 +58,7 @@ export async function saveClient(c) {
 export async function mergeClients(keepId, dropId) {
   const keep = db.get("clients", keepId), drop = db.get("clients", dropId);
   if (!keep || !drop || keepId === dropId) return;
-  const patch = {};
+  const patch: Rec = {};
   for (const k of FIELDS) if (!keep[k] && drop[k]) patch[k] = drop[k];
   if (drop.notes) patch.notes = [keep.notes, drop.notes].filter(Boolean).join("\n");
   const merged = await db.put("clients", { ...keep, ...patch });
@@ -69,7 +69,7 @@ export async function mergeClients(keepId, dropId) {
 
 // Ficha + números de cada cliente
 export function clientsWithStats() {
-  const byId = {};
+  const byId: Rec = {};
   for (const o of db.all("orders")) if (o.clientId && !o.archived) (byId[o.clientId] ||= []).push(o);
   return db.all("clients").map((c) => {
     const orders = byId[c.id] || [];

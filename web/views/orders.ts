@@ -58,7 +58,7 @@ export function sortOrders(list) {
   return list.sort((a, b) => (a.deadline || a.eventDate || "9999").localeCompare(b.deadline || b.eventDate || "9999"));
 }
 
-export function orderCard(o, { compact = false } = {}) {
+export function orderCard(o, { compact = false }: Rec = {}) {
   const u = urgency(o);
   const st = statusOf(o.status);
   const total = orderTotal(o);
@@ -211,7 +211,7 @@ function activeHTML(list) {
 const hlClass = (o) => { if (o.status === "entregado" || !o.deadline) return ""; const t = today(); return o.deadline < t ? "hl-late" : o.deadline === t ? "hl-today" : o.deadline === addDays(t, 1) ? "hl-tomorrow" : ""; };
 
 // Columnas del cuadro: se pueden mostrar u ocultar desde "Columnas" (se recuerda en cada dispositivo)
-const COLUMNS = [
+const COLUMNS: Rec[] = [
   { key: "entrega", label: "Entrega", fixed: true, cell: (o, u) => `<td class="nowrap"><span class="udot ${u.cls}" title="${u.label}"></span>${o.deadline ? fmtDate(o.deadline) : "—"}</td>` },
   { key: "evento", label: "Evento", cell: (o) => `<td class="nowrap">${o.eventDate ? `🎉 ${fmtDate(o.eventDate)}` : "—"}</td>` },
   { key: "cliente", label: "Cliente", fixed: true, sticky: true, cell: (o) => `<td class="nowrap ccol"><b>${esc(o.client?.name || "Sin nombre")}</b>${o.client?.phone ? `<div class="small muted">${esc(o.client.phone)}</div>` : ""}</td>` },
@@ -510,7 +510,7 @@ function saleAnalysis({ its, sugTotal, total, usingSug, ships, other, payMethod,
 const priceInfo = (p) => !p?.price ? "" : `<span class="small muted">💲 ${p.priceMode === "pack" && p.packQty ? `${money(p.packPrice)} por ${p.packQty} u. · ${money(p.price)} c/u` : p.priceMode === "tiers" ? tiersOf(p).map((t) => `${money(t.price)} c/u desde ${t.min} u.`).join(" · ") : `${money(p.price)} c/u`}${p.minQty > 1 && p.priceMode !== "pack" ? ` · mínimo ${p.minQty} u.` : ""}${p.priceDate ? ` · precio del ${fmtDate(p.priceDate)}` : ""}</span>`;
 let rowSeq = 0;
 const comboChip = (name) => `<div class="small it-combo" style="grid-column:1/-1"><span class="chip accent">🎁 Combo ${esc(name || "")}</span></div>`;
-function itemRow(i = {}) {
+function itemRow(i: Rec = {}) {
   return `<div class="grid item-row" data-key="r${++rowSeq}" style="grid-template-columns: 2fr 1fr 80px 36px; gap:4px 8px; align-items:end">
     <label class="field">Producto<input name="product" list="dl-products" value="${esc(i.product || "")}" placeholder="Ej: Taza personalizada"></label>
     <label class="field">Categoría<select name="category">${categoryOptions(i.category)}</select></label>
@@ -538,7 +538,7 @@ function orderSuggestion(its, ships, pack, freeShip) {
   return { total, row };
 }
 
-export function openOrderForm(o = null, { title } = {}) {
+export function openOrderForm(o = null, { title }: Rec = {}) {
   const isNew = !o?.id;
   o = o ? structuredClone(o) : { status: "senado", items: [{ qty: 1 }], client: {} };
   const clients = uniqueClients();
@@ -631,7 +631,7 @@ export function openOrderForm(o = null, { title } = {}) {
         return { keys, perUnit, qty, total: perUnit }; // uno por pedido
       };
       // Envío de cada proveedor del pedido (se cuenta una vez por proveedor). Lo que tocás queda guardado acá.
-      const shipState = {};
+      const shipState: Rec = {};
       (o.supplierShip || []).forEach((x) => (shipState[x.supplierId] = { cost: x.cost, free: !!x.free }));
       const supShipDefault = (sid) => { const sc = db.get("suppliers", sid)?.shippingCost; return sc !== "" && sc != null && !isNaN(sc) ? Number(sc) : s.shipSmall; };
       const supplierShipping = (its) => {

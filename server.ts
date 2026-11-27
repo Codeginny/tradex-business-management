@@ -7,7 +7,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 import Anthropic from "@anthropic-ai/sdk";
-import { createStore } from "./store.js";
+import { createStore } from "./store.ts";
+import type { Change } from "./store.ts";
+
+type Schema = Record<string, unknown>;
+type Message = Anthropic.Beta.BetaMessageParam;
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, "public");
@@ -32,22 +36,26 @@ const store = createStore({
   dataDir: path.resolve(here, process.env.DATA_DIR || "data"),
   backupDir: path.resolve(here, process.env.BACKUP_DIR || path.join(process.env.DATA_DIR || "data", "backups")),
 });
-const runBackup = () => { try { const n = store.backup(); if (n) console.log(`  💾 Copia de seguridad: ${n}`); } catch (e) { console.error("Copia de seguridad falló:", e.message); } };
+const runBackup = () => { try { const n = store.backup(); if (n) console.log(`  💾 Copia de seguridad: ${n}`); } catch (e) { console.error("Copia de seguridad falló:", (e as Error).message); } };
 runBackup();
 setInterval(runBackup, 60 * 60 * 1000); // revisa cada hora; hace una copia por día
 
 const lanUrls = () => Object.values(os.networkInterfaces()).flat()
-  .filter((i) => i && i.family === "IPv4" && !i.internal).map((i) => `http://${i.address}:${PORT}`);
+  .filter((i) => i && i.family === "IPv4" && !i.internal).map((i) => `http://${i!.address}:${PORT}`);
 
-const MIME = {
+const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8", ".json": "application/json", ".webmanifest": "application/manifest+json",
   ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon",
 };
 
 // Llamada base: Opus 5.5 con fallback del servidor ante rechazos de seguridad.
-async function ask({ system, messages, tools, format, effort = "low", maxTokens = 16000 }) {
-  const params = {
+interface Ask { system: string; messages: Message[]; tools?: unknown[]; format?: Schema; effort?: "low" | "medium" | "high"; maxTokens?: number }
+
+async function ask({ system, messages, tools, format, effort = "low", maxTokens = 16000 }: Ask): Promise<string> {
+  if (!client) throw new Error("IA no configurada");
+  // fallbacks y output_config son parámetros beta que el SDK todavía no tipa
+  const params: Anthropic.Beta.MessageCreateParamsNonStreaming & Record<string, unknown> = {
     model: MODEL,
     max_tokens: maxTokens,
     system,
@@ -55,7 +63,7 @@ async function ask({ system, messages, tools, format, effort = "low", maxTokens 
     output_config: { effort, ...(format ? { format: { type: "json_schema", schema: format } } : {}) },
     betas: ["server-side-fallback-2026-07-01"],
     fallbacks: "default",
-    ...(tools ? { tools } : {}),
+    ...(tools ? { tools: tools as Anthropic.Beta.BetaToolUnion[] } : {}),
   };
   let res = await client.beta.messages.create(params);
   // Las búsquedas web largas pueden pausar el turno: lo retomamos.
@@ -65,10 +73,10 @@ async function ask({ system, messages, tools, format, effort = "low", maxTokens 
     res = await client.beta.messages.create(params);
   }
   if (res.stop_reason === "refusal") throw new Error("La IA no pudo responder esa consulta.");
-  return res.content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
+  return res.content.filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text").map((b) => b.text).join("\n").trim();
 }
 
-function parseJson(text) {
+function parseJson<T = Record<string, unknown>>(text: string): T | null {
   try { return JSON.parse(text); } catch {}
   const m = text.match(/\{[\s\S]*\}/);
   if (m) { try { return JSON.parse(m[0]); } catch {} }
@@ -137,13 +145,20 @@ Reglas:
 - Cuando estén los datos importantes, resumí en una oración y preguntá si guardás. Si confirma ("sí", "dale", "guardalo"), poné ready=true.
 - Si no se entiende la intención, intent "none" y preguntá qué quiere hacer.`;
 
-async function handleAssistant(body) {
+interface AssistantBody {
+  messages?: { role: "user" | "assistant"; content: string }[];
+  draft?: unknown;
+  intent?: string;
+  context?: { today?: string; clients?: string[]; suppliers?: string[] };
+}
+
+async function handleAssistant(body: AssistantBody) {
   const { messages = [], draft = null, intent = "none", context = {} } = body;
   const today = context.today || new Date().toISOString().slice(0, 10);
   const system = ASSISTANT_SYSTEM.replace("{{TODAY}}", today);
   const state = `Estado actual (no lo repitas al usuario):\nintent=${intent}\nborrador=${JSON.stringify(draft)}\nclientes conocidos=${(context.clients || []).slice(0, 60).join(", ")}\nproveedores conocidos=${(context.suppliers || []).slice(0, 60).join(", ")}`;
   // La conversación debe empezar con la dueña y alternar turnos: se unen mensajes seguidos del mismo rol.
-  const convo = [];
+  const convo: { role: "user" | "assistant"; content: string }[] = [];
   for (const m of messages.slice(-20)) {
     if (!convo.length && m.role !== "user") continue;
     const last = convo[convo.length - 1];
@@ -158,7 +173,7 @@ async function handleAssistant(body) {
 }
 
 // ---------- Búsqueda de datos de proveedores en internet ----------
-async function handleLookup({ name, product = "", province = "" }) {
+async function handleLookup({ name, product = "", province = "" }: { name: string; product?: string; province?: string }) {
   const text = await ask({
     system: "Buscás datos de contacto PÚBLICOS de comercios y proveedores mayoristas de Argentina. Nunca inventes datos: si no lo encontrás, dejalo vacío. Respondé SOLO con un objeto JSON.",
     messages: [{
@@ -185,7 +200,7 @@ const catalogSchema = {
     },
   },
 };
-async function handleCatalog({ pdfBase64, supplierName = "" }) {
+async function handleCatalog({ pdfBase64, supplierName = "" }: { pdfBase64: string; supplierName?: string }) {
   const text = await ask({
     system: "Extraés listas de precios de proveedores. Precios en pesos argentinos como número (sin $ ni puntos de miles). Si hay precio por cantidad, usá el unitario del mínimo de compra. Categorías: Tazas, Vasos, Botellas, Velas, Skincare, Mochilas, Difusor, Centro de mesa, Llaveros (si no encaja en ninguna, dejala vacía).",
     messages: [{
@@ -203,27 +218,28 @@ async function handleCatalog({ pdfBase64, supplierName = "" }) {
 }
 
 // ---------- HTTP ----------
-function readBody(req) {
+// Cada ruta recibe el cuerpo con la forma que espera; viene del navegador de la app
+function readBody<T = any>(req: http.IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
     let data = "";
-    req.on("data", (c) => { data += c; if (data.length > 40e6) reject(new Error("Archivo demasiado grande")); });
+    req.on("data", (c: Buffer) => { data += c; if (data.length > 40e6) reject(new Error("Archivo demasiado grande")); });
     req.on("end", () => { try { resolve(data ? JSON.parse(data) : {}); } catch (e) { reject(e); } });
   });
 }
-function send(res, code, obj) {
+function send(res: http.ServerResponse, code: number, obj: unknown) {
   res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(obj));
 }
 
-const routes = { "/api/assistant": handleAssistant, "/api/lookup": handleLookup, "/api/catalog": handleCatalog };
+const routes: Record<string, (body: any) => Promise<unknown>> = { "/api/assistant": handleAssistant, "/api/lookup": handleLookup, "/api/catalog": handleCatalog };
 
 http.createServer(async (req, res) => {
-  const url = new URL(req.url, "http://localhost");
+  const url = new URL(req.url ?? "/", "http://localhost");
   if (url.pathname === "/api/status") return send(res, 200, { ai: hasKey, model: MODEL, sync: true, pin: Boolean(PIN), urls: lanUrls(), backupDir: store.backupDir });
   // Con TRADEX_PIN en .env, nadie más en el Wi-Fi puede leer tus datos ni usar la IA.
   if (url.pathname.startsWith("/api/") && PIN && (req.headers["x-tradex-pin"] || url.searchParams.get("pin")) !== PIN) return send(res, 401, { error: "PIN incorrecto" });
   try {
-    if (url.pathname === "/api/sync" && req.method === "POST") { const out = store.sync(await readBody(req)); runBackup(); return send(res, 200, out); }
+    if (url.pathname === "/api/sync" && req.method === "POST") { const out = store.sync(await readBody<{ since?: number; changes?: Change[] }>(req)); runBackup(); return send(res, 200, out); }
     if (url.pathname === "/api/photo" && req.method === "POST") {
       const photo = store.savePhoto((await readBody(req)).dataUrl);
       return photo ? send(res, 200, { url: photo }) : send(res, 400, { error: "Foto inválida" });
@@ -237,16 +253,16 @@ http.createServer(async (req, res) => {
       return fs.createReadStream(f).pipe(res);
     }
   } catch (e) {
-    console.error(url.pathname, e.message);
-    return send(res, 500, { error: e.message });
+    console.error(url.pathname, (e as Error).message);
+    return send(res, 500, { error: (e as Error).message });
   }
   if (routes[url.pathname] && req.method === "POST") {
     if (!client) return send(res, 503, { error: "IA no configurada: agregá ANTHROPIC_API_KEY en el archivo .env" });
     try {
       return send(res, 200, await routes[url.pathname](await readBody(req)));
     } catch (e) {
-      console.error(url.pathname, e.message);
-      return send(res, 500, { error: e.message });
+      console.error(url.pathname, (e as Error).message);
+      return send(res, 500, { error: (e as Error).message });
     }
   }
   // Fotos de productos (nombres imposibles de adivinar; se pueden guardar en caché para siempre)
