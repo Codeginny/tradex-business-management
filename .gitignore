@@ -1,0 +1,10 @@
+# Dependencias
+node_modules/
+
+# Entorno y datos locales
+.env
+data/
+
+# Configuración local de herramientas
+.claude/
+.vscode/
