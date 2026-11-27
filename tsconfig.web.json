@@ -1,0 +1,20 @@
+{
+  // Frontend (web/ → public/js/): el navegador carga los .js que genera tsc, sin bundler.
+  // strict, salvo noImplicitAny y strictNullChecks: las vistas arman el DOM con plantillas
+  // y leen registros JSON libres de IndexedDB; tiparlos a fondo queda como mejora pendiente.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "rootDir": "web",
+    "outDir": "public/js",
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": ["web"],
+  "exclude": ["web/sw.ts"]
+}

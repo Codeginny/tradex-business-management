@@ -1,0 +1,7 @@
+{
+  // Service worker: va en la raíz de public/ para controlar toda la app.
+  "extends": "./tsconfig.web.json",
+  "compilerOptions": { "lib": ["ES2024", "WebWorker"], "outDir": "public", "strict": true, "noImplicitAny": true, "strictNullChecks": true },
+  "include": ["web/sw.ts", "web/global.d.ts"],
+  "exclude": []
+}

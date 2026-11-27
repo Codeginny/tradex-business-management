@@ -12,7 +12,7 @@ StartLimitIntervalSec=0
 
 [Service]
 WorkingDirectory=$DIR
-ExecStart=$NODE $DIR/server.js
+ExecStart=$NODE $DIR/server.ts
 Restart=always
 RestartSec=15
 
