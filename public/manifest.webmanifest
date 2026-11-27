@@ -1,0 +1,10 @@
+{
+  "name": "TRADEX · Gestión",
+  "short_name": "TRADEX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0d10",
+  "theme_color": "#ff3b4e",
+  "lang": "es-AR",
+  "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
